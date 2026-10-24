@@ -1,18 +1,17 @@
-当前更新：跳舞与零额度拳击已替换为维护者提供的兔兔原版 GIF，作者为疚刃（Bilibili UID 107716290）。跳舞来源 https://www.bilibili.com/video/BV16Vap6yEGP/ ，70 帧／7 秒；拳击来源 https://www.bilibili.com/video/BV1SZpR6hEcv/ ，98 帧／9.8 秒。保留原尺寸、原画面与每帧 100 毫秒延时；App 副本只去掉无限循环标记，由用户设置决定次数。未 AI 重绘或补帧。已按维护者要求加入本机与私有测试包，公开分发授权由维护者自行询问中。代码 MIT 不覆盖这些动图；早期素材许可不自动适用。详见 CREDITS.md 与 ASSET-PERMISSIONS.md。
+当前定制版素材来源
 
-角色形象来源（用户提供出处）：ZipZipPipe，Bilibili UID 4168597
-https://space.bilibili.com/4168597/
-普通立绘由用户直接提供并保留；坐姿彩蛋基于该角色参考，通过 ImageGen 制作。
-应用图标由普通立绘制作。低额度形象来源另见 low-quota-SOURCE.txt。
-跳舞素材来源：这个刀子真甜，《大肥鱼一键跟跳》，Bilibili UID 23315338
-https://www.bilibili.com/video/BV1ovpE66Es8/
-跳舞片段已获视频作者同意用于本项目彩蛋并随源码／安装包分发，保留署名与链接。
-具体用途范围见 ASSET-PERMISSIONS.md；此同意不扩大为原角色设计或其他素材的统一授权。
-完整来源、加工方式和代码关系见包内 CREDITS.md 或仓库 docs/CREDITS.md。
-本节说明当前定制素材；下文保留上游素材声明。当前普通立绘的来源以
-USER-CHARACTER-SOURCE.txt 为准，不把本版用户提供原图写成上游生成图。
-第三方形象、视频和参考图的权利归各自权利人；署名不代表额外授权。
-代码 MIT 许可不适用于这些素材，也不授予第三方素材的商用或独立分发权。
+普通龙娘立绘由维护者提供并原样保留；形象出处署名 ZipZipPipe（Bilibili UID 4168597）：https://space.bilibili.com/4168597/ 。坐姿 stretch 图片和低额度图片按角色参考通过 ImageGen 生成或加工；原位伸缩由程序实现。
+
+App 图标使用该普通立绘，图标底板、布局、缩放与多尺寸导出由 CatGod4456 使用 Codex 辅助制作；菜单栏图标由当前普通形象缩放。角色设计与图标制作分别署名，详见 ICON-SOURCE.txt。
+
+当前跳舞与拳击动图作者：疚刃，Bilibili UID 107716290。
+跳舞：https://www.bilibili.com/video/BV16Vap6yEGP/ （70 帧／7 秒）
+拳击：https://www.bilibili.com/video/BV1SZpR6hEcv/ （98 帧／9.8 秒）
+维护者于 2026-10-24 确认两份原版动图已获本项目用途授权。原画面、尺寸和每帧 100 ms 延时保留；App 副本只移除无限循环标记，由设置控制次数。保留作者、来源与实际约定条件，不据此扩大为任意商用、转授权或独立素材包分发。
+
+此前《大肥鱼一键跟跳》素材作者：这个刀子真甜（UID 23315338），来源 https://www.bilibili.com/video/BV1ovpE66Es8/ ，保留其对本项目用途的同意及作者贡献记录。
+
+代码 MIT 不统一重新许可第三方图片、图标、音视频、角色和标识。素材按来源方适用条件使用；来源、维护者加工与角色设计分别记录。完整清单与范围见包内 CREDITS.md、ASSET-PERMISSIONS.md。
 
 --- 上游声明保留 / Preserved upstream notice ---
 

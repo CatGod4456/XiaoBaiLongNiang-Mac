@@ -1,14 +1,14 @@
 # 小白龙娘 · macOS WebView 改进版 1.14
 
-> 发布准备中：当前仓库为私有预览，安装包保存在 Release 草稿。早期视频片段的用途许可继续记录；本次原版动图的来源已注明，公开许可由维护者询问中，由维护者决定公开时机。
+> 发布准备中：仓库与 Release 保持私有草稿。两份原版动图已按维护者确认记录本项目用途授权；来源、主要贡献和图标制作分别署名，公开时机由维护者确认。
 
 本项目是非官方的 Codex 额度挂件，与 OpenAI 无隶属、赞助或背书关系。
 
 基于 [T7moris/GPT-Niang v1.3.5](https://github.com/T7moris/GPT-Niang/tree/v1.3.5) 的 Mac 定制改进版：查看 Codex 剩余额度、桌面龙娘、低额度形象与可设置的点击彩蛋。
 
-[下载安装包](https://github.com/CatGod4456/XiaoBaiLongNiang-Mac/releases/latest) · [更新公告](docs/RELEASE-1.14.md) · [来源与致谢](docs/CREDITS.md) · [上游项目](https://github.com/T7moris/GPT-Niang)
+[查看发布草稿](https://github.com/CatGod4456/XiaoBaiLongNiang-Mac/releases) · [更新公告](docs/RELEASE-1.14.md) · [来源与致谢](docs/CREDITS.md) · [上游项目](https://github.com/T7moris/GPT-Niang)
 
-主体应用代码来自 **T7moris/GPT-Niang**，角色形象来源为 **ZipZipPipe**，早期跳舞素材引用 **这个刀子真甜**，当前跳舞与拳击采用用户提供的疚刃原版 GIF。本仓库独立创建并保留上游历史，记录的是我在实际 Mac 使用反馈基础上做的细节改进；本次更新使用 **Codex 辅助生成、修改和验证**。
+主体应用代码来自 **T7moris/GPT-Niang**，原生 Mac 移植主要来自 **meaqua9420**，角色形象来源为 **ZipZipPipe**，早期跳舞素材引用 **这个刀子真甜**，当前跳舞与拳击采用用户提供的疚刃原版 GIF。本仓库独立创建并保留上游历史，记录的是我在实际 Mac 使用反馈基础上做的细节改进；本次更新使用 **Codex 辅助生成、修改和验证**。
 
 ![模拟额度状态：正常、低额度和恢复](docs/images/demo-quota.png)
 
@@ -79,41 +79,34 @@
 - 平时伸缩和跳舞各 2.5%；有效额度为 0 时，三种各占 `5% ÷ 3`（约 1.67%），合计最多 5%。每次点击独立抽取，关闭某种不会把概率转给其他种。失败、旧快照、已过重置时间的窗口或四舍五入看起来为 0 的正数，不触发零额度彩蛋。
 - 开关和次数在重启后保留；再次点击人物可以停止播放。设置里的预览按钮可直接查看效果。
 
-## 来源与创作者署名
+## 主要贡献与创作者署名
 
-| 类别 | 来源 |
+| 贡献者／来源 | 贡献与本改版关系 |
 | --- | --- |
-| 创意与交互参考 | [MeteorNOX / DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget) |
-| 直接源码基础 | [T7moris / GPT-Niang](https://github.com/T7moris/GPT-Niang)，基于 v1.3.5；[上游下载页](https://github.com/T7moris/GPT-Niang/releases) |
-| 原生 Mac 移植 | 上游贡献者 [meaqua9420](https://github.com/meaqua9420) 及 [其他贡献者](docs/UPSTREAM-CREDITS.md) |
-| 早期跳舞视频素材 | [这个刀子真甜](https://space.bilibili.com/23315338/)：《[大肥鱼一键跟跳](https://www.bilibili.com/video/BV1ovpE66Es8/)》 |
-| 形象来源 | [ZipZipPipe](https://space.bilibili.com/4168597/)，按用户提供的形象出处署名 |
+| [T7moris / GPT-Niang](https://github.com/T7moris/GPT-Niang) | 主体代码与项目维护；直接基础为 v1.3.5，保留原版权、MIT 许可和 Git 历史 |
+| [meaqua9420](https://github.com/meaqua9420) 与 [其他上游贡献者](docs/UPSTREAM-CREDITS.md) | 原生 Mac 移植及额度、安装、更新、兼容、审查与反馈；本改版在此基础上完善 |
+| [MeteorNOX / DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget) | 创意与交互参考、经典气泡和语录，保留对应 MIT 文本 |
+| [ZipZipPipe](https://space.bilibili.com/4168597/) · UID 4168597 | 龙娘形象出处；普通立绘、当前坐姿／低额度加工及衍生图标继续保留形象署名 |
+| [疚刃](https://space.bilibili.com/107716290/) · UID 107716290 | 当前[兔兔跳舞](https://www.bilibili.com/video/BV16Vap6yEGP/)和[拳击](https://www.bilibili.com/video/BV1SZpR6hEcv/)原版动图；维护者已确认本项目用途授权 |
+| [这个刀子真甜](https://space.bilibili.com/23315338/) · UID 23315338 | 此前《[大肥鱼一键跟跳](https://www.bilibili.com/video/BV1ovpE66Es8/)》素材与项目用途同意，贡献和出处保留 |
+| [CatGod4456](https://github.com/CatGod4456) / [邱会作](https://space.bilibili.com/319500223/) | 本次需求、反馈、维护与 macOS WebView 交互完善；代码、测试、图标排版和说明使用 Codex 辅助完成 |
+| [Node.js](https://nodejs.org/) 及其依赖贡献者 | 包内运行时，保留官方来源、校验和完整许可 |
 
-普通立绘由用户提供；坐姿彩蛋基于角色参考、通过 ImageGen 制作；早期跳舞 GIF 从上述视频中提取并处理透明背景。当前跳舞、拳击直接使用疚刃的原版 GIF：[跳舞来源](https://www.bilibili.com/video/BV16Vap6yEGP/) / [拳击来源](https://www.bilibili.com/video/BV1SZpR6hEcv/)。两份已按维护者要求加入本机与私有测试包，公开分发授权由维护者询问中。原角色设计和视频动作归对应创作者，本改版记录素材来源与处理方式。
+<img src="docs/images/app-icon.png" width="128" alt="由龙娘普通立绘制作的 macOS 应用图标">
 
-本次需求、使用反馈和发布由 CatGod4456 整理；代码修改与验证使用 Codex 辅助完成。更完整的代码关系、素材加工和许可说明见 [CREDITS](docs/CREDITS.md)。
+**App 图标也保留素材署名。** 它由维护者提供的普通龙娘立绘制作，角色出处为 ZipZipPipe；CatGod4456 使用 Codex 辅助完成淡紫渐变底板、圆角、阴影、缩放排版及 macOS 多尺寸导出。菜单栏图标由当前普通形象缩放。图标制作贡献与原角色设计分别记录，见 [图标来源](gpt-niang-usage/assets/ICON-SOURCE.txt)。
 
-## 关注与感谢
+当前坐姿和低额度图片的生成／加工工具为 ImageGen；当前两份兔兔动图保留原版。音效原样沿用 GPT-Niang。详细加工、原生 Mac 贡献、运行时及音效来源见 [完整致谢](docs/CREDITS.md)。
 
-[关注主播](https://space.bilibili.com/319500223/) 谢谢喵
+## 许可与协作
 
-感谢提供源码、早期跳舞素材与角色形象的三位 UP 主：
+代码和一般文档沿用 [MIT License](LICENSE)，保留上游版权与许可文本。MIT 允许按其条件复用、修改和商业分发代码；本项目当前免费分发，不改变上游已有许可。
 
-| UP 主 | B 站 UID | 本项目引用来源 |
-| --- | --- | --- |
-| [T7moris](https://space.bilibili.com/642488914/) | 642488914 | GPT-Niang 源码作者 |
-| [这个刀子真甜](https://space.bilibili.com/23315338/) | 23315338 | 《大肥鱼一键跟跳》跳舞素材 |
-| [ZipZipPipe](https://space.bilibili.com/4168597/) | 4168597 | 角色形象来源 |
+角色、图标、音视频和第三方标识按各自来源条件使用，代码 MIT 不统一重新许可这些素材。两份原版动图已获本项目用途授权的记录见 [素材来源与授权](docs/ASSET-PERMISSIONS.md)，本项目保留作者、原作品链接和实际同意的使用条件。
 
-感谢原作者与开源贡献者。
+本仓库独立维护 macOS 衍生改进，保留上游历史，并按原有功能、本次改动、素材与工具处理分别署名。欢迎向本仓库提交 Issue 和 PR；对上游的实际回馈以对应 PR 和合并记录为准。参与方式见 [CONTRIBUTING](CONTRIBUTING.md)。
 
-## 许可
-
-早期跳舞片段已获得视频作者对本项目所述用途的同意；该许可不自动覆盖本次另行提供的新参考与零额度动图，见 [素材许可记录](docs/ASSET-PERMISSIONS.md)。
-
-代码与一般文档保留上游 [MIT License](LICENSE)，以及 [MeteorNOX 上游语录许可](gpt-niang-usage/assets/quotes-LICENSE.txt) 和 [参考代码许可](references/whale-widget-LICENSE.txt)。
-
-**角色图片、图标和视频动画不因代码开源而适用 MIT。** 第三方素材的权利及使用条件仍归原权利人；来源署名不表示获得额外授权。本仓库不授予第三方角色、视频的商业使用或独立素材包分发权。详见 [素材声明](gpt-niang-usage/assets/CHARACTER-NOTICE.txt)。
+[关注主播](https://space.bilibili.com/319500223/) 谢谢喵，也请支持上面提供主体代码、创意、形象和动图的作者。
 
 ## 从源码构建
 

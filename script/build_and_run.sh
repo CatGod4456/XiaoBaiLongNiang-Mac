@@ -45,6 +45,7 @@ cp "$ROOT_DIR/references/whale-widget-LICENSE.txt" "$APP_BUNDLE/Contents/Resourc
 cp "$ROOT_DIR/gpt-niang-usage/assets/quotes-LICENSE.txt" "$APP_BUNDLE/Contents/Resources/quotes-LICENSE.txt"
 cp "$ROOT_DIR/gpt-niang-usage/assets/CHARACTER-NOTICE.txt" "$APP_BUNDLE/Contents/Resources/CHARACTER-NOTICE.txt"
 cp "$ROOT_DIR/gpt-niang-usage/assets/USER-CHARACTER-SOURCE.txt" "$APP_BUNDLE/Contents/Resources/USER-CHARACTER-SOURCE.txt"
+cp "$ROOT_DIR/gpt-niang-usage/assets/ICON-SOURCE.txt" "$APP_BUNDLE/Contents/Resources/ICON-SOURCE.txt"
 bash "$ROOT_DIR/script/embed-node.sh" "$APP_BUNDLE/Contents/Resources" "$TASK_CACHE/node"
 "$GPT_NIANG_SWIFT" "$ROOT_DIR/script/create-app-icon.swift" "$ROOT_DIR/gpt-niang-usage/assets/gpt-dragon-niang-bust.png" "$TASK_CACHE/AppIcon.iconset"
 /usr/bin/iconutil -c icns "$TASK_CACHE/AppIcon.iconset" -o "$APP_BUNDLE/Contents/Resources/AppIcon.icns"

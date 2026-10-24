@@ -48,7 +48,7 @@
 
 <img src="media/zero.gif" width="360" alt="仅零额度随机触发的彩蛋">
 
-直接使用原版拳击 GIF，98 帧、9.8 秒，原尺寸与每帧 100 毫秒的延时保持不变。有效额度精确为 0 时才参与随机触发；设置内预览不受额度限制。来源：[疚刃《我小兔子也绝非善类》](https://www.bilibili.com/video/BV1SZpR6hEcv/)。公开分发授权由维护者询问中，见 [素材许可记录](ASSET-PERMISSIONS.md)。
+直接使用原版拳击 GIF，98 帧、9.8 秒，原尺寸与每帧 100 毫秒的延时保持不变。有效额度精确为 0 时才参与随机触发；设置内预览不受额度限制。来源：[疚刃《我小兔子也绝非善类》](https://www.bilibili.com/video/BV1SZpR6hEcv/)。维护者已确认本项目用途授权，见 [素材许可记录](ASSET-PERMISSIONS.md)。
 
 ## 实机案例
 

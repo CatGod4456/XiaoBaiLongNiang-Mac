@@ -1,4 +1,4 @@
-> 私有发布草稿，尚未公开。当前原版动图的来源已注明，公开分发授权由维护者询问中；原项目和早期素材的署名与许可记录保留。
+> 私有发布草稿，尚未公开。两份原版动图已按维护者确认记录本项目用途授权；代码、原生 Mac 移植、角色、App 图标和本次改进分别署名。
 
 # 小白龙娘 1.14 · macOS WebView 改进版
 
@@ -66,42 +66,37 @@
 
 当前包采用本地临时签名，尚未经过 Apple 公证。首次打开若被系统阻止，请核对下载来源后，按 macOS“隐私与安全性”的提示确认；无需关闭系统安全功能。当前为 Apple Silicon 包，Intel、旧系统及多屏／全屏组合仍需更多实机验证。
 
-## 来源与感谢
+## 主要贡献与创作者署名
 
-| 来源 | 本项目引用内容 |
+| 贡献者／来源 | 贡献与本改版关系 |
 | --- | --- |
-| [MeteorNOX / DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget) | 创意与交互参考，保留语录和气泡参考代码的 MIT 许可 |
-| [T7moris / GPT-Niang](https://github.com/T7moris/GPT-Niang) | 直接源码基础；感谢 [meaqua9420](https://github.com/meaqua9420) 的原生 Mac 移植与上游贡献者 |
-| [这个刀子真甜](https://space.bilibili.com/23315338/) | 早期《[大肥鱼一键跟跳](https://www.bilibili.com/video/BV1ovpE66Es8/)》素材及项目用途同意，历史记录保留 |
-| [ZipZipPipe](https://space.bilibili.com/4168597/) | 按维护者提供的形象出处署名 |
+| [T7moris / GPT-Niang](https://github.com/T7moris/GPT-Niang) | 主体代码与项目维护；直接基础为 v1.3.5，保留原版权、MIT 许可和 Git 历史 |
+| [meaqua9420](https://github.com/meaqua9420) 与 [其他上游贡献者](UPSTREAM-CREDITS.md) | 原生 Mac 移植及额度、安装、更新、兼容、审查与反馈；本改版在此基础上完善 |
+| [MeteorNOX / DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget) | 创意与交互参考、经典气泡和语录，保留对应 MIT 文本 |
+| [ZipZipPipe](https://space.bilibili.com/4168597/) · UID 4168597 | 龙娘形象出处；普通立绘、当前坐姿／低额度加工及衍生图标继续保留形象署名 |
+| [疚刃](https://space.bilibili.com/107716290/) · UID 107716290 | 当前[兔兔跳舞](https://www.bilibili.com/video/BV16Vap6yEGP/)和[拳击](https://www.bilibili.com/video/BV1SZpR6hEcv/)原版动图；维护者已确认本项目用途授权 |
+| [这个刀子真甜](https://space.bilibili.com/23315338/) · UID 23315338 | 此前《[大肥鱼一键跟跳](https://www.bilibili.com/video/BV1ovpE66Es8/)》素材与项目用途同意，贡献和出处保留 |
+| [CatGod4456](https://github.com/CatGod4456) / [邱会作](https://space.bilibili.com/319500223/) | 本次需求、反馈、维护与 macOS WebView 交互完善；代码、测试、图标排版和说明使用 Codex 辅助完成 |
+| [Node.js](https://nodejs.org/) 及其依赖贡献者 | 包内运行时，保留官方来源、校验和完整许可 |
 
-当前跳舞与零额度拳击由用户提供原版 GIF，视频作者为疚刃（UID 107716290），来源与公开授权进度见下文；不套用早期视频片段的同意。角色、参考图和视频动画不因代码开源而适用 MIT。完整来源与范围见 [CREDITS](CREDITS.md)、[素材许可记录](ASSET-PERMISSIONS.md)。
+<img src="images/app-icon.png" width="128" alt="由龙娘普通立绘制作的 macOS 应用图标">
 
-[关注主播](https://space.bilibili.com/319500223/) 谢谢喵
+**App 图标也保留素材署名。** 它由维护者提供的普通龙娘立绘制作，角色出处为 ZipZipPipe；CatGod4456 使用 Codex 辅助完成淡紫渐变底板、圆角、阴影、缩放排版及 macOS 多尺寸导出。菜单栏图标由当前普通形象缩放。图标制作贡献与原角色设计分别记录，见 [图标来源](../gpt-niang-usage/assets/ICON-SOURCE.txt)。
 
-也感谢三位 UP 主的贡献：
+当前坐姿和低额度图片的生成／加工工具为 ImageGen；当前两份兔兔动图保留原版。音效原样沿用 GPT-Niang。详细加工、原生 Mac 贡献、运行时及音效来源见 [完整致谢](CREDITS.md)。
 
-| UP 主 | B 站 UID | 来源 |
-| --- | --- | --- |
-| [T7moris](https://space.bilibili.com/642488914/) | 642488914 | GPT-Niang 源码 |
-| [这个刀子真甜](https://space.bilibili.com/23315338/) | 23315338 | 早期跳舞视频素材 |
-| [ZipZipPipe](https://space.bilibili.com/4168597/) | 4168597 | 角色形象 |
+## 许可与协作
+
+代码和一般文档沿用 [MIT License](../LICENSE)，保留上游版权与许可文本。MIT 允许按其条件复用、修改和商业分发代码；本项目当前免费分发，不改变上游已有许可。
+
+角色、图标、音视频和第三方标识按各自来源条件使用，代码 MIT 不统一重新许可这些素材。两份原版动图已获本项目用途授权的记录见 [素材来源与授权](ASSET-PERMISSIONS.md)，本项目保留作者、原作品链接和实际同意的使用条件。
+
+本仓库独立维护 macOS 衍生改进，保留上游历史，并按原有功能、本次改动、素材与工具处理分别署名。欢迎向本仓库提交 Issue 和 PR；对上游的实际回馈以对应 PR 和合并记录为准。参与方式见 [CONTRIBUTING](../CONTRIBUTING.md)。
+
+[关注主播](https://space.bilibili.com/319500223/) 谢谢喵，也请支持上面提供主体代码、创意、形象和动图的作者。
 
 ## 验证范围
 
 通过 150 项原生测试和 17 项构建入口 Node 测试，覆盖零额度有效性、5% 固定抽取区间、开关和次数保存、GIF 解码与周期、普通短按反馈等。应用、后台和动图均为本地资源；额度查询沿用上游只读方式，不发起模型生成。
 
 已检查发布包结构、签名、个人路径与常见凭证模式；具体边界见 [安全与隐私检查](SECURITY-REVIEW.md)。完整新增控件的鼠标操作、多屏与全屏组合尚未全部验收，检查结果不等同独立安全认证。
-
-<!-- candidate-animation-sources-20261024 -->
-## 当前原版动图与授权进度
-
-两份原版 GIF 由维护者于 2026-10-24 提供；视频来源核对为 [疚刃](https://space.bilibili.com/107716290/)，B 站 UID **107716290**：
-
-- 跳舞：[《若不是你突然闯进我生活》](https://www.bilibili.com/video/BV16Vap6yEGP/)，70 帧、7 秒，950 × 950。
-- 零额度拳击：[《我小兔子也绝非善类》](https://www.bilibili.com/video/BV1SZpR6hEcv/)，98 帧、9.8 秒，500 × 406。
-
-两份均保留原角色、原动作、每帧 100 毫秒的原始节奏。展示 GIF 原样保留；应用副本只去掉无限循环标记，播放次数由用户设置。没有 AI 重绘、补帧、裁切、缩放或重新抠图。
-
-维护者已明确要求加入并启用本机挂件与私有测试包。创作者对公开分发的具体答复、署名要求和允许范围仍由维护者自行询问，尚未记录为已获授权；仓库保持私有，Release 保持草稿。早期素材的许可不套用到这两份作品，代码 MIT 也不覆盖角色和动图。
-<!-- /candidate-animation-sources-20261024 -->

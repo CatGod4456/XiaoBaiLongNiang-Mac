@@ -15,28 +15,9 @@ The boxing video description additionally credits the motion to 抖音渝欢.
 
 Both original GIFs were provided by the maintainer. The app copies remove only the NETSCAPE infinite-loop extension; every encoded frame, transparency, dimension and delay is retained. Decoded RGBA pixels were checked against every original frame. No AI redraw, interpolation, recrop, resize or foreground extraction is used. The showcase GIFs are byte-identical originals.
 
-The maintainer explicitly requested local/private-package inclusion and activation. Public distribution permission is being requested by the maintainer; no creator approval is recorded yet. Repository remains private and Release remains a draft. Code MIT does not relicense third-party characters or animations.
+On 2026-10-24, maintainer CatGod4456 confirmed permission for both original animations for this project. Keep the creator, source video links and actual agreed conditions with the project source, demonstrations and macOS package. This does not grant arbitrary commercial reuse, sublicensing or standalone asset-pack distribution. Repository remains private and Release remains a draft; code MIT does not relicense third-party rights.
 
 Playback: spring/stretch unchanged; dance and zero default to one cycle, with individual switches and 1-10 or continuous-loop controls. Normal quota: stretch and dance each 2.5%. Confirmed current exact zero quota: all three occupy 5% / 3 each. Disabled/missing slots are not transferred; draws do not accumulate. Clicking stops current playback.
 
-The preceding white-dragon AI redraws are no longer selected. Historical keyframes, inbetweens and prompts remain in the repository as an unused production record. See docs/media/MOTION-PROCESS.md.
 
-EARLIER VERSION PROVENANCE (retained historical record; the earlier dance below is replaced)
-
-Easter-egg assets, custom macOS build, 2026-10-23
-
-Normal character: the user-provided image is copied unchanged. See USER-CHARACTER-SOURCE.txt in the main Resources directory.
-
-Sitting stretch: egg-squish.png was created with the built-in ImageGen tool from the user-provided dragon-girl image and seated-doll pose reference. It is a separate optional asset; it does not replace the normal character. Runtime motion uses in-place horizontal/vertical stretch around the visible feet, without rotation or translation.
-Final generation prompt: Create one full-body seated extra-chibi version of the reference dragon girl. Keep her pale segmented horns, curled ahoge, silver/lavender long hair, purple eyes, pointed ears, knot hair brooch with diamond tassel, and original white/lavender dress and jewelry. Use the seated doll reference only for pose: enormous head, compact body, knees and shoes forward, arms slightly out. Face and torso coherently face slightly image-left. Transparent square sprite, complete horns/hair/hands/feet, no background, shadow or text. Do not copy the pose reference character's gray hair, business suit or dark pants.
-
-Dance: egg-dance.gif is a foreground extraction from the publicly supplied Bilibili video “大肥鱼一键跟跳”, creator 这个刀子真甜.
-Source: https://www.bilibili.com/video/BV1ovpE66Es8/
-Selected segment: 00:09.0–00:13.55 (the complete central white character, excluding her offscreen entrance and the later zoom transition).
-Duration: 4.55 seconds, 91 frames at 20 fps, transparent GIF, no audio.
-Local processing: anime foreground segmentation, removal of neighboring characters/background, enclosed-skin matte repair, GIF alpha/disposal verification. The GIF contains exactly one motion cycle, without an intrinsic loop. The application replays that cycle only according to the user-selected count. Original character motion was retained.
-These assets were prepared for a custom widget. Character-image source supplied by the user: ZipZipPipe, https://space.bilibili.com/4168597/. Video creator profile: https://space.bilibili.com/23315338/. See repository docs/CREDITS.md for public provenance and rights notices. No additional rights in references, characters or source video are claimed. Source-code MIT licensing does not relicense third-party character/video artwork.
-
-Playback controls: a master switch and separate switches for each egg; 1–10 cycles or continuous playback. Defaults: stretch 3 cycles of 0.8 s, dance 1 cycle of 4.55 s. Each enabled variant retains its own fixed 2.5% interval; disabled variants do not transfer their probability. Preferences persist locally. Clicking the character stops ongoing playback.
-
-Project-specific permission recorded 2026-10-23: the video creator consented to converting the described GPT dance clip into a transparent animation, using it as this project's Easter egg, and distributing it with this project's source and installer, with the creator name and source video link preserved. See docs/ASSET-PERMISSIONS.md (also packaged in App Resources). This does not relicense all video/character artwork under MIT.
+Current spring/stretch image: ImageGen processing based on the maintainer-provided dragon character and seated pose reference. In-place rhythm stretch is implemented by code. Normal character and derived icon source: ZipZipPipe (as supplied by maintainer); see USER-CHARACTER-SOURCE.txt, ICON-SOURCE.txt and CREDITS.md.

@@ -1,0 +1,18 @@
+App and menu-bar icon provenance — 小白龙娘 / local GPT 娘 build
+
+Character-image source supplied by the maintainer: ZipZipPipe, Bilibili UID 4168597.
+https://space.bilibili.com/4168597/
+
+App icon input: gpt-niang-usage/assets/gpt-dragon-niang-bust.png
+Unmodified user-supplied normal portrait SHA-256:
+61dacbb1dcbdd3f9e2ac5067dbd89bfb26beab28a3b36c8385ad6cf1506ec520
+
+Icon layout and export: CatGod4456 using Codex assistance.
+Implementation: script/create-app-icon.swift.
+Processing: program-drawn lavender gradient rounded card, shadow and border; proportional character placement; multiple macOS PNG sizes converted to AppIcon.icns.
+The character illustration/design is credited to its source, separately from icon layout and export. The icon is not represented as a newly created original character.
+
+Menu-bar icon: the current normal portrait is copied and resized to 20x20 by macos/Sources/GPTNiangMac/MenuBarPresentation.swift. It updates when the user imports a new normal portrait.
+
+Source code/documentation follow the existing project MIT license. Character artwork, derived icons and third-party marks follow their respective source conditions; this record does not relicense third-party rights or imply official endorsement.
+See CREDITS.md, USER-CHARACTER-SOURCE.txt and CHARACTER-NOTICE.txt.
