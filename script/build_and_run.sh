@@ -39,6 +39,7 @@ cp "$ROOT_DIR/gpt-niang-usage/assets/gpt-dragon-niang-bust.png" "$ROOT_DIR/gpt-n
 cp "$ROOT_DIR/LICENSE" "$APP_BUNDLE/Contents/Resources/LICENSE"
 cp "$ROOT_DIR/docs/CREDITS.md" "$APP_BUNDLE/Contents/Resources/CREDITS.md"
 cp "$ROOT_DIR/docs/UPSTREAM-CREDITS.md" "$APP_BUNDLE/Contents/Resources/UPSTREAM-CREDITS.md"
+cp "$ROOT_DIR/docs/SECURITY-REVIEW.md" "$APP_BUNDLE/Contents/Resources/SECURITY-REVIEW.md"
 cp "$ROOT_DIR/references/whale-widget-LICENSE.txt" "$APP_BUNDLE/Contents/Resources/Whale-Widget-LICENSE.txt"
 cp "$ROOT_DIR/gpt-niang-usage/assets/quotes-LICENSE.txt" "$APP_BUNDLE/Contents/Resources/quotes-LICENSE.txt"
 cp "$ROOT_DIR/gpt-niang-usage/assets/CHARACTER-NOTICE.txt" "$APP_BUNDLE/Contents/Resources/CHARACTER-NOTICE.txt"
@@ -58,7 +59,7 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
 <key>CFBundleVersion</key><string>$VERSION</string>
-<key>LSMinimumSystemVersion</key><string>13.0</string>
+<key>LSMinimumSystemVersion</key><string>13.5</string>
 <key>LSUIElement</key><true/>
 <key>NSPrincipalClass</key><string>NSApplication</string>
 <key>NSHighResolutionCapable</key><true/>
@@ -68,6 +69,8 @@ PLIST
 # iCloud/Finder can add presentation metadata to generated bundles.
 /usr/bin/xattr -rd com.apple.FinderInfo "$APP_BUNDLE" 2>/dev/null || true
 /usr/bin/xattr -rd com.apple.ResourceFork "$APP_BUNDLE" 2>/dev/null || true
+# Remove local debug symbols before signing distributable executables.
+/usr/bin/strip -S -x "$APP_BUNDLE/Contents/MacOS/$APP_NAME" "$APP_BUNDLE/Contents/Helpers/GPTNiangUpdater"
 /usr/bin/codesign --force --sign - "$APP_BUNDLE/Contents/Helpers/GPTNiangUpdater"
 /usr/bin/codesign --force --sign - "$APP_BUNDLE/Contents/Resources/node"
 /usr/bin/codesign --force --deep --sign - "$APP_BUNDLE"

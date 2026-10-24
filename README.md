@@ -1,17 +1,21 @@
 # GPT 娘 · macOS WebView 改进版
 
+> 发布准备中：当前仓库为私有预览，安装包保存在 Release 草稿。第三方素材的公开分发许可确认后，再由维护者决定公开发布。
+
 基于 [T7moris/GPT-Niang v1.3.5](https://github.com/T7moris/GPT-Niang/tree/v1.3.5) 的 Mac 定制改进版：查看 Codex 剩余额度、桌面龙娘、低额度形象与可设置的点击彩蛋。
 
 [下载安装包](https://github.com/CatGod4456/GPT-Niang-Mac-WebView/releases/latest) · [来源与致谢](docs/CREDITS.md) · [上游项目](https://github.com/T7moris/GPT-Niang)
 
-<p>
-  <img src="gpt-niang-usage/assets/gpt-dragon-niang-bust.png" width="220" alt="普通龙娘形象，形象来源见致谢">
-  <img src="macos/Sources/GPTNiangMac/WebWidget/egg-squish.png" width="220" alt="基于角色参考、通过 ImageGen 制作的坐姿彩蛋">
-</p>
+主体应用代码来自 **T7moris/GPT-Niang**，角色形象来源为 **ZipZipPipe**，跳舞素材来自 **这个刀子真甜**。本仓库独立创建并保留上游历史，记录的是我在实际 Mac 使用反馈基础上做的细节改进；本次更新使用 **GPT / Codex 辅助生成、修改和验证**。
+
+![模拟额度状态：正常、低额度和恢复](docs/images/demo-quota.png)
+
+以上是采用实际 Web 组件渲染的高清模拟图，数字为演示数据。更多 [菜单栏、彩蛋与实机案例](docs/SHOWCASE.md)。
+
 
 ## 相比原版改进了什么
 
-原版已有 macOS 应用、额度查询、窗口跟随、菜单栏入口和点击音效。以下是本改进版的主要变化。
+原版已有 macOS 应用、额度查询、窗口跟随、菜单栏入口和点击音效。实际使用时，我希望少打开一次气泡、减少小窗口抢占、让人物贴底更自然，也能自己决定彩蛋开关与播放次数。此次更新围绕这些需求展开。
 
 | 项目 | 本改进版的变化 |
 | --- | --- |
@@ -26,6 +30,18 @@
 | 安装 | Apple Silicon 安装包内置经过官方校验的 Node.js，无需另外安装 Node.js |
 
 透明空白区域可穿透点击；气泡收起后，原生窗口会裁到人物范围。桌面显示、跟随模式与原有音量等设置继续保留。
+
+## 效果展示
+
+![模拟菜单栏：正常、低额度、等待数据](docs/images/demo-menubar.png)
+
+![彩蛋效果与播放设置说明](docs/images/demo-eggs.png)
+
+设置里可以预览两个小彩蛋，也可以独立关闭或调整次数。坐姿图片为 AI 根据角色参考生成；跳舞动作来自原视频，透明背景由后续处理得到。普通立绘由用户提供并保留原图内容，三类来源分别记录在 [CREDITS](docs/CREDITS.md)。
+
+![用户提供的实机截图，主窗口私人内容已遮挡](docs/images/real-cases.png)
+
+这组是实机案例，和上面的模拟渲染分开展示；完整原始聊天截图不会随仓库或应用分发。
 
 ## 下载与使用
 
@@ -103,3 +119,5 @@ GPT_NIANG_BUILD_CONFIGURATION=release GPT_NIANG_BUILD_UNIVERSAL=1 bash script/bu
 本次 Mac 改进通过 144 项原生测试和 50 项相关 Node 测试，覆盖额度状态、透明区域命中、菜单栏、主窗口选择、彩蛋概率与播放控制；已在一台 Apple Silicon Mac 安装运行。新增控件的完整鼠标验收，以及多屏／全屏组合场景尚未全部完成。
 
 额度沿用上游的本地只读查询，不发起模型生成。WebView 加载本地资源，不接收账号凭证或聊天正文。仓库与下载包不包含本机登录配置、额度快照、聊天截图或个人设置。
+
+本次发布前进行了 [源码与发布包安全／隐私检查](docs/SECURITY-REVIEW.md)：修除编译路径信息，排除登录数据、个人设置及原始聊天截图；在检查范围内未发现明确的后门行为。此结果不是独立安全认证。
