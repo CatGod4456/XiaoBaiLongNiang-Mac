@@ -1,5 +1,5 @@
 Normal character image supplied directly by the user on 2026-10-23.
-Copied unchanged from codex-clipboard-823a21ff-4e7c-4e13-88fc-eda443399878.png.
+Copied unchanged from the user-provided PNG; temporary attachment identifiers omitted.
 SHA-256: 61dacbb1dcbdd3f9e2ac5067dbd89bfb26beab28a3b36c8385ad6cf1506ec520
 This build does not use the assistant's discarded image-generation drafts.
 Existing character/third-party rights are not expanded by this replacement.
