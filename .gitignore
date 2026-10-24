@@ -26,3 +26,11 @@ Thumbs.db
 **/gui.lock
 **/worker-ownership.lock
 **/worker.log
+
+# Local handoff, user screenshots and diagnostics; keep outside public commits
+/HANDOFF.md
+/START-NEXT-CHAT.txt
+/logs/
+/references/*.png
+/references/*.jpg
+/references/*.jpeg

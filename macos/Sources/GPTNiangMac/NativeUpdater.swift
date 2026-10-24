@@ -24,6 +24,7 @@ final class NativeUpdater: ObservableObject {
         status = InterfaceLanguage.traditional.text(key, arguments: arguments)
     }
     @Published private(set) var busy = false
+    var customBuild: Bool { Bundle.main.object(forInfoDictionaryKey: "GPTNiangCustomBuild") as? Bool == true }
     let currentVersion: String
     private let data: URL
     private let app: URL
@@ -60,12 +61,13 @@ final class NativeUpdater: ObservableObject {
                 }
                 guard Date().timeIntervalSince(self.started) >= 30 else { return }
                 if !self.cleanupChecked && !self.busy { self.cleanupChecked = true; self.clean(); return }
-                if self.automatic && Date().timeIntervalSince1970 >= self.schedule.nextCheck { self.check(manual: false) }
+                if self.automatic && !self.customBuild && Date().timeIntervalSince1970 >= self.schedule.nextCheck { self.check(manual: false) }
             }
         }
     }
     func stop() { ticker?.invalidate(); ticker = nil; operation?.cancel() }
     private func sourceCheckout() -> Bool {
+        if Bundle.main.object(forInfoDictionaryKey: "GPTNiangCustomBuild") as? Bool == true { return true }
         var directory = app
         while directory.path != "/" {
             if FileManager.default.fileExists(atPath: directory.appendingPathComponent(".git").path) { return true }
@@ -87,7 +89,7 @@ final class NativeUpdater: ObservableObject {
     }
     func check(manual: Bool) {
         guard !busy else { return }
-        guard !sourceCheckout() else { setStatus("源碼版本請使用 Git 更新。"); return }
+        guard !sourceCheckout() else { setStatus("自定义 WebView 版本请从源码构建更新。"); return }
         guard !app.path.contains("/AppTranslocation/"), FileManager.default.isWritableFile(atPath: app.deletingLastPathComponent().path) else {
             setStatus("請先將 GPT 娘移到可寫入的應用程式目錄。"); return
         }

@@ -1,3 +1,19 @@
+本定制版的当前素材来源 / Current custom-build provenance
+
+角色形象来源（用户提供出处）：ZipZipPipe，Bilibili UID 4168597
+https://space.bilibili.com/4168597/
+普通立绘由用户直接提供并保留；坐姿彩蛋基于该角色参考，通过 ImageGen 制作。
+应用图标由普通立绘制作。低额度形象来源另见 low-quota-SOURCE.txt。
+跳舞素材来源：这个刀子真甜，《大肥鱼一键跟跳》，Bilibili UID 23315338
+https://www.bilibili.com/video/BV1ovpE66Es8/
+完整来源、加工方式和代码关系见包内 CREDITS.md 或仓库 docs/CREDITS.md。
+本节说明当前定制素材；下文保留上游素材声明。当前普通立绘的来源以
+USER-CHARACTER-SOURCE.txt 为准，不把本版用户提供原图写成上游生成图。
+第三方形象、视频和参考图的权利归各自权利人；署名不代表额外授权。
+代码 MIT 许可不适用于这些素材，也不授予第三方素材的商用或独立分发权。
+
+--- 上游声明保留 / Preserved upstream notice ---
+
 GPT-Niang 角色与图片素材使用声明 / GPT-Niang character and image asset notice
 
 适用范围

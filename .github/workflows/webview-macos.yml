@@ -1,0 +1,33 @@
+name: Build custom macOS WebView app
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Renderer tests
+        run: node --test gpt-niang-usage/tests/web-widget.test.mjs gpt-niang-usage/tests/deployment-health.test.mjs gpt-niang-usage/tests/macos-toolchain.test.mjs
+      - name: Swift behavior and WebKit tests
+        run: swift test --package-path macos
+      - name: Build universal App
+        env:
+          GPT_NIANG_BUILD_CONFIGURATION: release
+          GPT_NIANG_BUILD_UNIVERSAL: '1'
+        run: bash script/build_and_run.sh --build-only
+      - name: Verify and archive
+        run: |
+          codesign --verify --deep --strict dist/GPTNiangMac.app
+          lipo dist/GPTNiangMac.app/Contents/MacOS/GPTNiangMac -verify_arch arm64 x86_64
+          ditto -c -k --sequesterRsrc --keepParent dist/GPTNiangMac.app dist/GPTNiang-WebView-macOS.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GPTNiang-WebView-macOS
+          path: dist/GPTNiang-WebView-macOS.zip
+          if-no-files-found: error

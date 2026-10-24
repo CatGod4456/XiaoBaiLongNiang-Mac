@@ -1,0 +1,7 @@
+Low-quota character
+Reference: user-provided image(2).png.
+Derived using built-in image editing with transparent background.
+Prompt: Extract the complete exhausted lavender-haired dragon girl; remove dark background, all bubbles and text; preserve identity, expression, horns, ahoge, ornaments, outfit, wings and tail; center on a transparent canvas.
+The generated sprite is not a pixel-exact extraction.
+Asset SHA256: c8252fd31d5cab8c161acbbf2f89a52173e4ac241465ebbf0d1c19d85d4e6492
+The upstream character notice and rights of the reference material remain applicable.

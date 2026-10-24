@@ -10,7 +10,8 @@ let package = Package(
     targets: [
         .target(name: "GPTNiangCore", resources: [.process("Resources")]),
         .target(name: "GPTNiangUpdate"),
-        .executableTarget(name: "GPTNiangMac", dependencies: ["GPTNiangCore", "GPTNiangUpdate"]),
+        .executableTarget(name: "GPTNiangMac", dependencies: ["GPTNiangCore", "GPTNiangUpdate"],
+                          resources: [.copy("WebWidget")]),
         .executableTarget(name: "GPTNiangUpdater", dependencies: ["GPTNiangUpdate"]),
         .testTarget(name: "GPTNiangUpdateTests", dependencies: ["GPTNiangUpdate"]),
         .testTarget(name: "GPTNiangCoreTests", dependencies: ["GPTNiangCore"]),

@@ -1,20 +1,6 @@
-name: Test and publish Windows and macOS release
+name: Upstream Windows and macOS release (manual reference)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - gpt-niang-usage/package.json
-      - gpt-niang-usage/.codex-plugin/plugin.json
-      - gpt-niang-usage/assets/quotes.json
-      - gpt-niang-usage/assets/quote-layouts.json
-  pull_request:
-    paths:
-      - .github/workflows/release.yml
-      - scripts/**
-      - script/**
-      - macos/**
-      - gpt-niang-usage/**
   workflow_dispatch:
 
 permissions:
@@ -94,7 +80,7 @@ jobs:
           path: dist/*-macos-universal.zip
           if-no-files-found: error
   publish:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: ${{ false }}
     needs: [windows, macos]
     runs-on: ubuntu-latest
     timeout-minutes: 10

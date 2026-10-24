@@ -72,6 +72,10 @@ final class CompletionNotificationController {
         }
     }
     func stop() { dismiss(); stopMonitor() }
+    func suspendSurface() {
+        guard state.surface != nil else { return }
+        restoreLayer(); model.hideCompletion(); state.pause()
+    }
     private func restoreLayer() {
         guard let old = originalLayer else { return }; originalLayer = nil
         mainPanel.level = old.level; mainPanel.ignoresMouseEvents = old.ignoresMouse

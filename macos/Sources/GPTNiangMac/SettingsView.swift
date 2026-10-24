@@ -18,6 +18,26 @@ struct SettingsView: View {
             section1
             section2
             section3
+            characterSection
+            GroupBox("彩蛋") {
+                VStack(alignment: .leading, spacing: 10) {
+                    Toggle("开启随机彩蛋", isOn: $model.easterEggsEnabled)
+                    HStack {
+                        Toggle("节奏伸缩 · 2.5%", isOn: $model.squishEnabled)
+                        loopPicker($model.squishLoops)
+                        Button("预览") { model.playEasterEgg(.squish) }
+                            .disabled(!model.squishEnabled)
+                    }.disabled(!model.easterEggsEnabled)
+                    HStack {
+                        Toggle("小龙娘跳舞 · 2.5%", isOn: $model.danceEnabled)
+                        loopPicker($model.danceLoops)
+                        Button("预览") { model.playEasterEgg(.dance) }
+                            .disabled(!model.danceEnabled || !FileManager.default.fileExists(atPath: model.easterEggURL(.dance).path))
+                    }.disabled(!model.easterEggsEnabled)
+                    Text("各 2.5%，合计最多 5%；每次独立抽取，不累积。关闭一种不会增加另一种的概率。循环播放时，再次点击人物即可结束。")
+                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }.padding(10)
+            }
             section4
             section5
             if let error = model.settingsError { Text(error).font(.caption).foregroundStyle(.orange) }
@@ -45,6 +65,21 @@ struct SettingsView: View {
         .onChange(of: model.specialQuotes) { _ in model.updateAppearance(); model.savePreferences() }
         .onChange(of: model.bubbleTapAdvance) { _ in model.savePreferences() }
         .onChange(of: model.followCodex) { _ in model.savePreferences() }
+        .onChange(of: model.menuBarOnly) { _ in model.savePreferences() }
+        .onChange(of: model.hideInFullscreen) { _ in model.savePreferences() }
+        .onChange(of: model.lowQuotaEnabled) { _ in model.updateLowQuota(); model.savePreferences() }
+        .onChange(of: model.easterEggsEnabled) { _ in model.saveEasterEggPreferences() }
+        .onChange(of: model.squishEnabled) { _ in model.saveEasterEggPreferences() }
+        .onChange(of: model.danceEnabled) { _ in model.saveEasterEggPreferences() }
+        .onChange(of: model.squishLoops) { _ in model.saveEasterEggPreferences() }
+        .onChange(of: model.danceLoops) { _ in model.saveEasterEggPreferences() }
+    }
+
+    private func loopPicker(_ count: Binding<Int>) -> some View {
+        Picker("次数", selection: count) {
+            ForEach(1...10, id: \.self) { Text("\($0) 次").tag($0) }
+            Text("持续循环").tag(0)
+        }.labelsHidden().frame(width: 102)
     }
 
     private var section1: some View {
@@ -54,9 +89,13 @@ struct SettingsView: View {
                         Text(model.text("目前版本 %@", String(describing: updater.currentVersion)))
                         Spacer()
                         if updater.busy { ProgressView().controlSize(.small) }
-                        Button(model.text("檢查更新")) { updater.check(manual: true) }.disabled(updater.busy)
+                        Button(model.text("檢查更新")) { updater.check(manual: true) }.disabled(updater.busy || updater.customBuild)
                     }
-                    Toggle(model.text("自動檢查並安裝正式版"), isOn: $updater.automatic)
+                    if updater.customBuild {
+                        Text(model.text("自定义 WebView 版本请从源码构建更新。")).font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        Toggle(model.text("自動檢查並安裝正式版"), isOn: $updater.automatic)
+                    }
                     Text(updater.localizedStatus(model.language)).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     Text(model.text("下載後關閉此視窗，掛件空閒時才會替換應用。確認新版啟動後清理上一版與下載缓存；偏好和語錄保留。"))
                         .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
@@ -92,6 +131,10 @@ struct SettingsView: View {
                         Text(model.text("整个桌面自由拖动")).tag(false)
                     }.pickerStyle(.radioGroup)
                     if !model.followCodex { Toggle(model.text("始终置顶"), isOn: $model.desktopTopmost) }
+                    Toggle(model.text("收起到菜单栏"), isOn: $model.menuBarOnly)
+                    Toggle(model.text("其他应用全屏时自动隐藏"), isOn: $model.hideInFullscreen)
+                    Text(model.text("收起后可在菜单栏查看额度，或选择显示桌面挂件。透明区域不会阻挡点击。"))
+                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     Text(model.text("關閉後，掛件會固定在桌面；開啟時，Codex 隱藏或最小化後掛件也會隱藏。"))
                         .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     if let note = model.trackingNote { Text(note).font(.caption).foregroundStyle(.orange) }
@@ -124,6 +167,40 @@ struct SettingsView: View {
                     Toggle(model.text("點角色時也切換語錄／收起氣泡"), isOn: $model.bubbleTapAdvance)
                 }.padding(10)
             }
+    }
+
+    private var characterSection: some View {
+        GroupBox(model.text("形象与低额度状态")) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 20) {
+                    characterPicker(.normal, title: model.text("普通形象"))
+                    characterPicker(.low, title: model.text("低额度形象"))
+                }
+                Text(model.text("支持 PNG、JPEG、WebP。建议使用透明 PNG；导入后保存本地副本。"))
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                Toggle(model.text("额度低于 5% 自动切换形象"), isOn: $model.lowQuotaEnabled)
+                TextField(model.text("专属台词"), text: $model.lowQuotaQuote, axis: .vertical)
+                    .lineLimit(2...4)
+                HStack {
+                    Text(model.text("任一有效额度低于 5% 触发；确认额度恢复后自动还原。"))
+                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    Spacer()
+                    Button(model.text("保存台词")) { model.saveLowQuotaPreferences() }
+                }
+            }.padding(10)
+        }
+    }
+    private func characterPicker(_ variant: CharacterVariant, title: String) -> some View {
+        VStack(spacing: 8) {
+            if let image = model.characterImages.image(variant) {
+                Image(nsImage: image).resizable().scaledToFit().frame(width: 120, height: 100)
+            }
+            Text(title).font(.caption.weight(.semibold))
+            HStack {
+                Button(model.text("导入图片…")) { model.importCharacter(variant) }
+                Button(model.text("恢复默认")) { model.resetCharacter(variant) }
+            }
+        }.frame(maxWidth: .infinity)
     }
 
     private var section5: some View {

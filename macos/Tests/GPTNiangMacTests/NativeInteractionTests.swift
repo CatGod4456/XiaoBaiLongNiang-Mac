@@ -55,15 +55,15 @@ final class NativeInteractionTests: XCTestCase {
         let model = WidgetModel(dataDirectory: data, resources: data)
         model.refresh(); XCTAssertFalse(model.bubble)
         XCTAssertTrue(FileManager.default.fileExists(atPath: data.appendingPathComponent("refresh.flag").path))
-        model.characterClick(); XCTAssertTrue(model.bubble); XCTAssertNil(model.message)
+        model.characterClick(draw: 0.5); XCTAssertTrue(model.bubble); XCTAssertNil(model.message)
         model.sceneStarted = .distantPast
         model.refresh(); XCTAssertEqual(model.sceneStarted, .distantPast)
         model.refresh(renewBubble: true); XCTAssertNotEqual(model.sceneStarted, .distantPast)
         model.clickBubble(); XCTAssertNotNil(model.message)
-        model.characterClick(); XCTAssertNil(model.message); XCTAssertTrue(model.bubble)
+        model.characterClick(draw: 0.5); XCTAssertNil(model.message); XCTAssertTrue(model.bubble)
         model.bubbleTapAdvance = true
-        model.characterClick(); XCTAssertNotNil(model.message)
-        model.characterClick(); XCTAssertFalse(model.bubble)
+        model.characterClick(draw: 0.5); XCTAssertNotNil(model.message)
+        model.characterClick(draw: 0.5); XCTAssertFalse(model.bubble)
         model.refreshing = false; model.interactionActive = true; XCTAssertFalse(model.updateIdle)
         model.interactionActive = false; XCTAssertTrue(model.updateIdle)
     }

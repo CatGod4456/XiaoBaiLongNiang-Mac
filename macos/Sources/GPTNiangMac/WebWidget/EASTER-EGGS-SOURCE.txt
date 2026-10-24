@@ -1,0 +1,15 @@
+Easter-egg assets, custom macOS build, 2026-10-23
+
+Normal character: the user-provided image is copied unchanged. See USER-CHARACTER-SOURCE.txt in the main Resources directory.
+
+Sitting stretch: egg-squish.png was created with the built-in ImageGen tool from the user-provided dragon-girl image and seated-doll pose reference. It is a separate optional asset; it does not replace the normal character. Runtime motion uses in-place horizontal/vertical stretch around the visible feet, without rotation or translation.
+Final generation prompt: Create one full-body seated extra-chibi version of the reference dragon girl. Keep her pale segmented horns, curled ahoge, silver/lavender long hair, purple eyes, pointed ears, knot hair brooch with diamond tassel, and original white/lavender dress and jewelry. Use the seated doll reference only for pose: enormous head, compact body, knees and shoes forward, arms slightly out. Face and torso coherently face slightly image-left. Transparent square sprite, complete horns/hair/hands/feet, no background, shadow or text. Do not copy the pose reference character's gray hair, business suit or dark pants.
+
+Dance: egg-dance.gif is a foreground extraction from the publicly supplied Bilibili video “大肥鱼一键跟跳”, creator 这个刀子真甜.
+Source: https://www.bilibili.com/video/BV1ovpE66Es8/
+Selected segment: 00:09.0–00:13.55 (the complete central white character, excluding her offscreen entrance and the later zoom transition).
+Duration: 4.55 seconds, 91 frames at 20 fps, transparent GIF, no audio.
+Local processing: anime foreground segmentation, removal of neighboring characters/background, enclosed-skin matte repair, GIF alpha/disposal verification. The GIF contains exactly one motion cycle, without an intrinsic loop. The application replays that cycle only according to the user-selected count. Original character motion was retained.
+These assets were prepared for a custom widget. Character-image source supplied by the user: ZipZipPipe, https://space.bilibili.com/4168597/. Video creator profile: https://space.bilibili.com/23315338/. See repository docs/CREDITS.md for public provenance and rights notices. No additional rights in references, characters or source video are claimed. Source-code MIT licensing does not relicense third-party character/video artwork.
+
+Playback controls: a master switch and separate switches for each egg; 1–10 cycles or continuous playback. Defaults: stretch 3 cycles of 0.8 s, dance 1 cycle of 4.55 s. Each enabled variant retains its own fixed 2.5% interval; disabled variants do not transfer their probability. Preferences persist locally. Clicking the character stops ongoing playback.

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'none'; frame-src 'none'; object-src 'none'; media-src 'none'; font-src 'none'; base-uri 'none'; form-action 'none'">
+<title>GPT 娘</title>
+<link rel="stylesheet" href="widget.css">
+<body>
+<main id="viewport">
+  <div id="stage" class="stage">
+    <!-- Classic bubble geometry: MeteorNOX/DeepSeek-Balance-Whale-Widget, MIT. -->
+    <svg class="cloud" viewBox="0 0 1026 700" aria-hidden="true">
+      <path id="bubble-shape" d="M 827 248 A 373 232 0 1 0 81 246 A 373 232 0 0 0 301 465 A 57 32 10 0 0 413 484 A 373 232 0 0 0 827 248 Z"/>
+    </svg>
+    <svg class="thought thought-far" width="25" height="18" aria-hidden="true"><ellipse cx="12.5" cy="9" rx="10.5" ry="7"/></svg>
+    <svg class="thought thought-near" width="17" height="12" aria-hidden="true"><ellipse cx="8.5" cy="6" rx="6.5" ry="4"/></svg>
+    <section id="content" class="content readable" aria-live="polite">
+      <div id="quota">
+        <header><span id="quota-title"></span><button id="refresh" type="button" aria-label="刷新额度">↻</button></header>
+        <div id="rows"></div>
+        <p id="error"></p>
+        <p id="stale"></p>
+      </div>
+      <button id="message" class="message" type="button"></button>
+    </section>
+    <button id="character" class="character" type="button" aria-label="点击查看额度，拖动调整位置">
+      <img class="portrait normal" src="normal.png?revision=0" alt="" draggable="false">
+      <img class="portrait low" src="low.png?revision=0" alt="" draggable="false">
+      <img id="egg-portrait" class="portrait egg" src="egg-squish.png?revision=0" alt="" draggable="false">
+      <span class="tint" aria-hidden="true"></span>
+    </button>
+    <button id="settings" class="settings readable" type="button" aria-label="挂件设置">
+      <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4h10M3 8h10M3 12h10"/></svg>
+    </button>
+  </div>
+</main>
+<template id="quota-row">
+  <div class="quota-row">
+    <div class="quota-line"><span class="window-title"></span><strong class="percentage"></strong></div>
+    <div class="track"><div class="fill"></div></div>
+    <div class="reset"></div>
+  </div>
+</template>
+<script src="widget.js"></script>
+</body>
+</html>

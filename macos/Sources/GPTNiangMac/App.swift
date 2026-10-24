@@ -48,7 +48,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private var dragOrigin: CGPoint?
     private var previousFollow: Bool?
     private var dragEvents = 0
+    private var lastStatusCheck = -Double.infinity
+    private var menuIconRevision = -1
+    private var lastFullscreenCheck = -Double.infinity
+    private var cachedFullscreenHidden = false
     private var diagnosticsURL: URL?
+    private var deploymentHealthURL: URL?
+    private var lastDeploymentHealth = -Double.infinity
     private let logger = Logger(subsystem: "io.github.t7moris.GPTNiangMac", category: "window")
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -72,6 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         }
         guard let resources = Bundle.main.resourceURL else { NSApp.terminate(nil); return }
         diagnosticsURL = argument("--diagnostics").map { URL(fileURLWithPath: $0) }
+        deploymentHealthURL = argument("--deployment-health").map { URL(fileURLWithPath: $0) }
         model = WidgetModel(dataDirectory: dataDirectory, resources: resources)
         updater = NativeUpdater(data: dataDirectory, idle: { [weak self] in
             guard let self else { return false }
@@ -120,6 +127,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     func menuWillOpen(_ menu: NSMenu) {
         trackingMenus += 1
         for item in menu.items {
+            if item.representedObject as? String == "quota-summary" {
+                let windows = model.snapshot.displayWindows
+                item.title = windows.isEmpty ? model.text("暂无法读取") : windows.map { "\($0.title(language: model.language)) \($0.percentageText)%" }.joined(separator: "  ·  ")
+            }
+            if item.action == #selector(toggleMenuBarOnly) {
+                item.title = model.text(model.menuBarOnly ? "显示桌面挂件" : "收起到菜单栏")
+            }
             model.audio.updateNativeItem(item)
             if item.action == #selector(toggleCompletion) { item.state = model.completionEnabled ? .on : .off }
             if item.action == #selector(showQuota) { item.title = model.text(model.bubble && model.message == nil ? "收起气泡" : "查看額度") }
@@ -139,12 +153,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     }
     private func buildMenu() {
         if statusItem == nil { statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength) }
-        statusItem?.button?.image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: model.text("GPT 娘"))
+        updateMenuIcon()
         let menu = NSMenu(); menu.delegate = self
+        let summary = NSMenuItem(title: model.text("正在讀取目前帳戶的額度…"), action: nil, keyEquivalent: "")
+        summary.representedObject = "quota-summary"; summary.isEnabled = false; menu.addItem(summary)
+        menu.addItem(.separator())
         for (title, selector) in [(model.text("GPT 娘 · Codex 額度"), #selector(showQuota)), (model.text("刷新額度"), #selector(refresh)), (model.text("來一句語錄"), #selector(quote)), (model.text("聊天速度…"), #selector(showSpeed))] {
             let item = NSMenuItem(title: model.text(title), action: selector, keyEquivalent: ""); item.target = self; menu.addItem(item)
         }
         menu.addItem(.separator())
+        let collapse = NSMenuItem(title: model.text("收起到菜单栏"), action: #selector(toggleMenuBarOnly), keyEquivalent: "")
+        collapse.target = self; menu.addItem(collapse)
         let reminder = NSMenuItem(title: model.text("回答结束提醒"), action: #selector(toggleCompletion), keyEquivalent: ""); reminder.target = self; menu.addItem(reminder)
         let audio = NSMenuItem(title: model.text("声音与点击"), action: nil, keyEquivalent: "")
         audio.submenu = model.audio.nativeMenu(target: self, action: #selector(audioAction(_:)), delegate: self); menu.addItem(audio)
@@ -179,7 +198,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         model.audio.perform(command[0], slot: AudioSlot(rawValue: command[1]))
     }
     @objc private func toggleCompletion() { model.completionEnabled.toggle(); model.savePreferences() }
-    @objc private func showQuota() { model.toggleQuota(); updateWindow() }
+    @objc private func showQuota() {
+        if model.menuBarOnly { model.menuBarOnly = false; model.savePreferences() }
+        model.toggleQuota(); updateWindow()
+    }
+    @objc private func toggleMenuBarOnly() {
+        model.menuBarOnly.toggle(); model.savePreferences(); updateWindow()
+    }
     @objc private func refresh() { model.refresh() }
     @objc private func quote() { model.showQuote() }
     @objc private func checkUpdate() { showSettings(); updater.check(manual: true) }
@@ -241,7 +266,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         if cadence.presence(now: now, visible: false) { model.writePresence(visible: false) }
     }
     @objc private func spaceChanged(_ notification: Notification) {
-        guard model.followCodex else { return }
+        lastFullscreenCheck = -Double.infinity
         // The notification covers every display. A Space change on another
         // monitor must not hide an unchanged host on this one.
         forceHostDiscovery = true; needsHostOrder = true
@@ -249,7 +274,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     }
     @objc private func applicationChanged(_ notification: Notification) {
         if notification.name == NSWorkspace.didActivateApplicationNotification { recordFocusDisplay() }
-        guard model.followCodex else { return }
+        lastFullscreenCheck = -Double.infinity
+        guard model.followCodex else { updateWindow(); return }
         forceHostDiscovery = true; needsHostOrder = true
         readStageManager()
         let changed = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
@@ -294,15 +320,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             }
             frontmostScreen = focusDisplay.resolve(window: frontmostFrame, screens: screens)
         }
-        for window in windows {
+        let candidates: [(frame: CGRect, number: Int)] = windows.compactMap { window in
             guard (window[kCGWindowOwnerPID as String] as? Int32) == app.processIdentifier,
                   (window[kCGWindowLayer as String] as? Int) == 0,
                   (window[kCGWindowIsOnscreen as String] as? Bool) == true,
                   let bounds = window[kCGWindowBounds as String] as? [String: CGFloat],
                   let width = bounds["Width"], let height = bounds["Height"], width >= 480, height >= 300,
-                  let number = window[kCGWindowNumber as String] as? Int else { continue }
+                  let number = window[kCGWindowNumber as String] as? Int else { return nil }
             let quartz = CGRect(x: bounds["X"] ?? 0, y: bounds["Y"] ?? 0, width: width, height: height)
             let frame = WidgetPlacement.appKitRect(quartz: quartz, mainDisplayHeight: CGDisplayBounds(CGMainDisplayID()).height)
+            return (frame, number)
+        }
+        for (frame, number) in WindowFollowPolicy.prioritizeMainWindows(candidates) {
             let mouseDraggingHost = frontmost && (NSEvent.pressedMouseButtons & 1) != 0
             guard WindowFollowPolicy.usableHost(frame, screens: screens,
                 allowClipped: mouseDraggingHost || hostGeometry.isTracking(number: number)) else { continue }
@@ -319,16 +348,79 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
                     needsHostOrder = true
                 }
             }
-            // A full list is front-to-back: choose the current foremost Codex
-            // window rather than retaining an older, still-visible window.
+            // Keep browser previews and other small auxiliary windows from
+            // replacing the main chat window as the companion's host.
             selectedHostNumber = number
             return (frame, number)
         }
         selectedHostNumber = nil
         return nil
     }
+    private func otherApplicationFullscreen(now: TimeInterval) -> Bool {
+        guard model.hideInFullscreen else { return false }
+        if now-lastFullscreenCheck < 0.25 { return cachedFullscreenHidden }
+        lastFullscreenCheck = now
+        guard let app = NSWorkspace.shared.frontmostApplication else { cachedFullscreenHidden = false; return false }
+        let rows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        let frames = rows.compactMap { row -> CGRect? in
+            guard (row[kCGWindowOwnerPID as String] as? Int32) == app.processIdentifier,
+                  (row[kCGWindowLayer as String] as? Int) == 0,
+                  let b = row[kCGWindowBounds as String] as? [String: CGFloat] else { return nil }
+            return WidgetPlacement.appKitRect(quartz: CGRect(x: b["X"] ?? 0, y: b["Y"] ?? 0, width: b["Width"] ?? 0, height: b["Height"] ?? 0),
+                                             mainDisplayHeight: CGDisplayBounds(CGMainDisplayID()).height)
+        }
+        cachedFullscreenHidden = WidgetVisibilityPolicy.hideForFullscreen(frontmostBundle: app.bundleIdentifier,
+            companionActive: app.processIdentifier == ProcessInfo.processInfo.processIdentifier,
+            windows: frames, screens: NSScreen.screens.map(\.frame))
+        return cachedFullscreenHidden
+    }
+    private func updateMenuIcon() {
+        statusItem?.button?.image = MenuBarPresentation.characterIcon(model.characterImages.image(.normal))
+        statusItem?.button?.imagePosition = .imageLeading
+        statusItem?.button?.imageScaling = .scaleProportionallyDown
+        menuIconRevision = model.characterRevision
+    }
+    private func updateStatusItem() {
+        let clock = ProcessInfo.processInfo.systemUptime
+        guard clock-lastStatusCheck >= 1 else { return }; lastStatusCheck = clock
+        if menuIconRevision != model.characterRevision { updateMenuIcon() }
+        let title = MenuBarPresentation.quotaTitle(model.snapshot)
+        if statusItem?.button?.title != title { statusItem?.button?.title = title }
+        statusItem?.button?.toolTip = model.text(model.isLowQuota ? "额度低于 5%" : "GPT 娘 · Codex 額度")
+    }
     private func updateWindow() {
         guard model != nil, panel != nil else { return }
+        let clock = ProcessInfo.processInfo.systemUptime
+        updateStatusItem()
+        if let deploymentHealthURL, clock-lastDeploymentHealth >= 1 {
+            lastDeploymentHealth = clock
+            let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+            let health: [String: Any] = [
+                "at": Date().timeIntervalSince1970*1000,
+                "pid": ProcessInfo.processInfo.processIdentifier,
+                "appPath": Bundle.main.bundleURL.resolvingSymlinksInPath().path,
+                "version": version, "webViewReady": model.webViewReady,
+                "workerReady": model.workerHealthy(version: version),
+                "quotaReady": model.snapshot.ok && !model.snapshot.stale(at: Date())
+            ]
+            if let encoded = try? JSONSerialization.data(withJSONObject: health) {
+                do {
+                    try encoded.write(to: deploymentHealthURL, options: .atomic)
+                    if health["webViewReady"] as? Bool == true && health["workerReady"] as? Bool == true && health["quotaReady"] as? Bool == true {
+                        self.deploymentHealthURL = nil
+                    }
+                } catch {}
+            }
+        }
+        let suppressed = model.menuBarOnly || otherApplicationFullscreen(now: clock)
+        model.surfaceVisible = !suppressed
+        if suppressed {
+            completion.suspendSurface(); panel.orderOut(nil); needsHostOrder = true
+            // Menu-bar quota is still visible and should refresh once a minute.
+            let quotaVisible = statusItem != nil
+            if cadence.presence(now: clock, visible: quotaVisible) { model.writePresence(visible: quotaVisible) }
+            return
+        }
         if completion.temporaryTopmost {
             let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier == "com.openai.codex"
             let busy = trackingMenus > 0 || dragOrigin != nil || model.interactionActive || model.audio.busy || settingsWindow?.isVisible == true || speedWindow?.isVisible == true || (model.bubble && !model.isCompletionMessage)
@@ -360,7 +452,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             if let (rect, number) = host {
                 hostRect = rect
                 let desired: CGRect? = dragOrigin == nil
-                    ? WidgetPlacement.followFrame(host: rect, size: size, x: model.x, y: model.y)
+                    ? WidgetPlacement.followFrame(host: rect, size: size, x: model.x, y: model.y, contentBottom: panel.characterBottom)
                     : panel.placementFrame
                 if let desired, panel.place(desired, clippedTo: rect) {
                     if model.displayScale != model.scale { model.displayScale = model.scale }
@@ -409,20 +501,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         let completionBusy = trackingMenus > 0 || dragOrigin != nil || model.interactionActive || model.audio.busy || settingsWindow?.isVisible == true || speedWindow?.isVisible == true || (model.bubble && !model.isCompletionMessage)
         completion.tick(codexFrontmost: codexFrontmost, busy: completionBusy)
         if completion.temporaryTopmost { _ = panel.place(panel.placementFrame, clippedTo: nil) }
+        model.surfaceVisible = visible
         wasCodexFrontmost = codexFrontmost
-        if cadence.presence(now: now, visible: visible) { model.writePresence(visible: visible) }
+        // The quota remains visible in the menu bar even while the desktop
+        // character is hidden, so keep its read-only refresh worker active.
+        let quotaVisible = visible || statusItem != nil
+        if cadence.presence(now: now, visible: quotaVisible) { model.writePresence(visible: quotaVisible) }
         if let diagnosticsURL, cadence.diagnostics(now: now) {
             let values: [String: Any] = ["visible": panel.isVisible, "followCodex": model.followCodex, "hostFound": host != nil,
                 "panelWindow": panel.windowNumber, "onActiveSpace": panel.isOnActiveSpace, "stageManager": stageManagerEnabled,
                 "geometryTransition": hostGeometry.transitioning, "windowLevel": panel.level.rawValue,
                 "focusScreen": frontmostScreen.map { NSStringFromRect($0) } ?? "",
                 "hostFrontmost": codexFrontmost, "collectionBehavior": panel.collectionBehavior.rawValue,
-                "hostWindow": host?.1 ?? 0, "frame": NSStringFromRect(panel.frame), "placementFrame": NSStringFromRect(panel.placementFrame), "quotaOK": model.snapshot.ok,
+                "hostWindow": host?.1 ?? 0, "hostFrame": hostRect.map { NSStringFromRect($0) } ?? "", "frame": NSStringFromRect(panel.frame), "placementFrame": NSStringFromRect(panel.placementFrame), "quotaOK": model.snapshot.ok,
+                "menuTitle": statusItem?.button?.title ?? "", "menuIconPresent": statusItem?.button?.image != nil,
+                "characterBottom": panel.characterBottom ?? 0,
+                "easterEgg": model.easterEgg?.rawValue ?? "",
                 "queryOK": model.snapshot.queryOk ?? false, "quotaWindowCount": model.snapshot.windows.count,
                 "hasMessage": model.message != nil, "bubbleVisible": model.bubble, "scale": model.scale,
                 "settingsVisible": settingsWindow?.isVisible ?? false, "speedVisible": speedWindow?.isVisible ?? false, "speedRows": speedStore.rows.count, "dragEvents": dragEvents, "displayScale": model.displayScale, "at": Date().timeIntervalSince1970]
             if let data = try? JSONSerialization.data(withJSONObject: values, options: [.prettyPrinted, .sortedKeys]) { try? data.write(to: diagnosticsURL, options: .atomic) }
         }
+        if !completion.temporaryTopmost { panel.updateMousePassthrough(captured: model.interactionActive || trackingMenus > 0) }
     }
     private func drag(_ translation: CGSize) {
         if translation == .zero {
@@ -455,12 +555,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         let insetX = min(12, max(0, area.width - panel.placementFrame.width))
         let insetY = min(12, max(0, area.height - panel.placementFrame.height))
         let usableX = max(0, area.width - panel.placementFrame.width - 24)
-        let usableY = max(0, area.height - panel.placementFrame.height - 24)
+        let bottom = panel.characterBottom.map { -$0 } ?? insetY
+        let usableY = max(0, area.height - panel.placementFrame.height - insetY - bottom)
         if usableX > 0 { model.x = min(1, max(0, (proposed.x - area.minX - insetX) / usableX)) }
-        if usableY > 0 { model.y = min(1, max(0, (proposed.y - area.minY - insetY) / usableY)) }
+        if usableY > 0 { model.y = min(1, max(0, (proposed.y - area.minY - bottom) / usableY)) }
         // Keep the full canvas/grab origin; only the visible viewport may change.
         _ = panel.place(CGRect(x: area.minX + insetX + usableX * model.x,
-                               y: area.minY + insetY + usableY * model.y,
+                               y: area.minY + bottom + usableY * model.y,
                                width: panel.placementFrame.width, height: panel.placementFrame.height), clippedTo: area)
     }
 }

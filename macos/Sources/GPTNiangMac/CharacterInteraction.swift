@@ -17,6 +17,8 @@ struct CharacterInteraction: NSViewRepresentable {
         var onDrag: (CGSize) -> Void = { _ in }
         var onClick: () -> Void = {}
         var onMenu: (NSEvent, NSView) -> Void = { _, _ in }
+        var onHover: (Bool) -> Void = { _ in }
+        private var hoverArea: NSTrackingArea?
         private var start: CGPoint?
         private var moved = false
         override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
@@ -34,5 +36,13 @@ struct CharacterInteraction: NSViewRepresentable {
         }
         override func rightMouseDown(with event: NSEvent) { onMenu(event, self) }
         override func resetCursorRects() { addCursorRect(bounds, cursor: .pointingHand) }
+        override func updateTrackingAreas() {
+            super.updateTrackingAreas()
+            if let hoverArea { removeTrackingArea(hoverArea) }
+            let area = NSTrackingArea(rect: bounds, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self, userInfo: nil)
+            addTrackingArea(area); hoverArea = area
+        }
+        override func mouseEntered(with event: NSEvent) { onHover(true) }
+        override func mouseExited(with event: NSEvent) { onHover(false) }
     }
 }

@@ -9,7 +9,22 @@ final class WidgetPanel: NSPanel {
     private let viewport = NSView()
     private var canvas: NSView?
     private var savedPlacement: CGRect?
+    private var savedHost: CGRect?
+    private var visibleContent: CGRect?
+    var characterBottom: CGFloat?
+    var interactiveAtScreenPoint: ((CGPoint) -> Bool)?
     var placementFrame: CGRect { savedPlacement ?? frame }
+
+    func setVisibleContent(_ rect: CGRect) {
+        guard visibleContent != rect else { return }
+        visibleContent = rect
+        if let savedPlacement { _ = place(savedPlacement, clippedTo: savedHost) }
+    }
+    func updateMousePassthrough(captured: Bool) {
+        guard let interactiveAtScreenPoint else { return }
+        let ignore = !captured && !interactiveAtScreenPoint(NSEvent.mouseLocation)
+        if ignoresMouseEvents != ignore { ignoresMouseEvents = ignore }
+    }
 
     func install(_ content: NSView) {
         canvas?.removeFromSuperview()
@@ -26,7 +41,10 @@ final class WidgetPanel: NSPanel {
     /// Cropping never writes preferences or changes window order/level.
     @discardableResult
     func place(_ desired: CGRect, clippedTo host: CGRect?) -> Bool {
-        guard let visible = WidgetPlacement.viewport(frame: desired, host: host),
+        savedHost = host
+        let content = visibleContent.map { CGRect(x: desired.minX+$0.minX, y: desired.minY+$0.minY, width: $0.width, height: $0.height) } ?? desired
+        let clip = host.map { $0.intersection(content) } ?? content
+        guard let visible = WidgetPlacement.viewport(frame: desired, host: clip),
               let canvas else { orderOut(nil); return false }
         savedPlacement = desired
         if frame != visible { setFrame(visible, display: false) }

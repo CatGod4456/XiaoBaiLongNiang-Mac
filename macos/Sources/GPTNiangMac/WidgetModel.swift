@@ -48,6 +48,26 @@ final class WidgetModel: ObservableObject {
     @Published var hideMenu: Bool
     @Published var completionEnabled = false
     @Published var isCompletionMessage = false
+    @Published var lowQuotaEnabled: Bool
+    @Published var lowQuotaQuote: String
+    @Published private(set) var isLowQuota = false
+    @Published var menuBarOnly: Bool
+    @Published var hideInFullscreen: Bool
+    @Published private(set) var characterRevision = 0
+    @Published private(set) var easterEgg: EasterEgg?
+    @Published private(set) var easterEggGeneration = 0
+    @Published var easterEggsEnabled: Bool
+    @Published var squishEnabled: Bool
+    @Published var danceEnabled: Bool
+    @Published var squishLoops: Int
+    @Published var danceLoops: Int
+    private var easterEggWork: DispatchWorkItem?
+    let characterImages: CharacterImageStore
+    var surfaceVisible = true
+    var webViewReady = false
+    private var lowQuotaState = LowQuotaState()
+    private var pendingLowQuotaNotice = false
+    private var showingLowQuotaQuote = false
     var onManualBubble: (() -> Void)?
     @Published var facingLeft = false
     var desktopNeedsMigration = false
@@ -117,6 +137,10 @@ final class WidgetModel: ObservableObject {
         // Keep preferences together with quota state; no shared Codex config edits.
         let prefs = dataDirectory.appendingPathComponent("preferences.json")
         let values = (try? Data(contentsOf: prefs)).flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] } ?? [:]
+        characterImages = CharacterImageStore(data: dataDirectory, resources: resources,
+            normal: values["normalCharacter"] as? String, low: values["lowCharacter"] as? String)
+        menuBarOnly = values["menuBarOnly"] as? Bool ?? false
+        hideInFullscreen = values["hideInFullscreen"] as? Bool ?? true
         language = InterfaceLanguage(rawValue: values["language"] as? String ?? "system") ?? .system
         defaults = .standard
         colorMode = ColorMode(rawValue: values["colorMode"] as? String ?? "mixed") ?? .mixed
@@ -128,13 +152,21 @@ final class WidgetModel: ObservableObject {
         scale = min(2.5, max(0.6, values["scale"] as? Double ?? 1))
         volume = min(1, max(0, values["volume"] as? Double ?? 0.9))
         loginRequested = values["loginRequested"] as? Bool ?? false
-        followCodex = values["followCodex"] as? Bool ?? true
+        followCodex = values["followCodex"] as? Bool ?? false
         desktopTopmost = values["desktopTopmost"] as? Bool ?? false
         desktopLeft = values["desktopLeft"] as? Double
         desktopBottom = values["desktopBottom"] as? Double
         soundOn = values["soundOn"] as? Bool ?? true
         hideMenu = values["hideMenu"] as? Bool ?? false
         completionEnabled = values["taskCompletionBubble"] as? Bool ?? false
+        easterEggsEnabled = values["easterEggsEnabled"] as? Bool ?? true
+        squishEnabled = values["squishEnabled"] as? Bool ?? true
+        danceEnabled = values["danceEnabled"] as? Bool ?? true
+        squishLoops = min(10, max(0, values["squishLoops"] as? Int ?? 3))
+        danceLoops = min(10, max(0, values["danceLoops"] as? Int ?? 1))
+        lowQuotaEnabled = values["lowQuotaEnabled"] as? Bool ?? true
+        let lowQuote = values["lowQuotaQuote"] as? String ?? "需要重置……"
+        lowQuotaQuote = Quote(text: lowQuote).valid ? lowQuote : "需要重置……"
         x = min(1, max(0, values["x"] as? Double ?? 1))
         y = min(1, max(0, values["y"] as? Double ?? 0))
         desktopNeedsMigration = !followCodex && desktopLeft == nil && values["layoutVersion"] == nil && !values.isEmpty
@@ -156,6 +188,7 @@ final class WidgetModel: ObservableObject {
         }
     }
     func stop() {
+        easterEggWork?.cancel(); easterEggWork = nil
         timer?.invalidate(); timer = nil; audio.stop()
         writePresence(visible: false)
         if let worker, worker.isRunning { worker.terminate() }; worker = nil
@@ -168,7 +201,8 @@ final class WidgetModel: ObservableObject {
         } else if lastStatusData != nil {
             lastStatusData = nil; snapshot = UsageSnapshot(error: text("正在讀取目前帳戶的額度…"))
         }
-        if Date() > refreshUntil { refreshing = false }
+        if refreshing && Date() > refreshUntil { refreshing = false }
+        deliverLowQuotaNotice()
         guard settleWorkerHandoff() else { return }
         if let request = readStopRequest(), request != initialStopRequest {
             if let worker, worker.isRunning { worker.terminate() }
@@ -183,7 +217,43 @@ final class WidgetModel: ObservableObject {
                 snapshot = (try? JSONDecoder().decode(UsageSnapshot.self, from: data)) ?? UsageSnapshot(error: text("额度数据无法读取，请刷新。"))
                 let checked = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["checkedAt"] as? Double
                 if checked != lastChecked { lastChecked = checked; refreshing = false }
+                updateLowQuota()
             }
+    }
+
+    func updateLowQuota(at now: Date = Date()) {
+        let wasLow = isLowQuota
+        isLowQuota = lowQuotaState.update(snapshot, enabled: lowQuotaEnabled, at: now)
+        if isLowQuota && !wasLow { pendingLowQuotaNotice = true }
+        if !isLowQuota {
+            pendingLowQuotaNotice = false
+            if showingLowQuotaQuote {
+                showingLowQuotaQuote = false; quoteGeneration += 1
+                message = nil; bubble = false; updateAppearance()
+            }
+        }
+    }
+
+    func saveLowQuotaPreferences() {
+        guard Quote(text: lowQuotaQuote).valid else {
+            settingsError = text("低额度台词需为 1 至 200 字。"); return
+        }
+        settingsError = nil; updateLowQuota(); savePreferences()
+        if showingLowQuotaQuote { message = lowQuotaQuote }
+    }
+
+    private func deliverLowQuotaNotice() {
+        guard pendingLowQuotaNotice, isLowQuota, !interactionActive,
+              !isCompletionMessage, !bubble, !menuBarOnly, surfaceVisible else { return }
+        showQuote()
+    }
+
+    func importCharacter(_ variant: CharacterVariant) {
+        do { if try characterImages.choose(variant) { characterRevision += 1; savePreferences(); settingsError = nil } }
+        catch { settingsError = error.localizedDescription }
+    }
+    func resetCharacter(_ variant: CharacterVariant) {
+        characterImages.reset(variant); characterRevision += 1; savePreferences()
     }
     private func workerRecord(_ name: String) throws -> QuotaWorkerRecord? {
         do {
@@ -371,7 +441,7 @@ final class WidgetModel: ObservableObject {
         if renewBubble && bubble && message == nil { restartTTL(delay: 0) }
         requestRefreshFlag()
     }
-    func hideBubble() { onManualBubble?(); isCompletionMessage = false; quoteGeneration += 1; bubble = false; updateAppearance() }
+    func hideBubble() { onManualBubble?(); isCompletionMessage = false; showingLowQuotaQuote = false; quoteGeneration += 1; bubble = false; updateAppearance() }
     func toggleQuota() {
         if bubble && message == nil { hideBubble() } else { showQuota() }
     }
@@ -390,6 +460,17 @@ final class WidgetModel: ObservableObject {
             "colorMode": colorMode.rawValue, "fullChance": fullChance, "textChance": textChance, "colorPaused": colorPaused,
             "specialQuotes": specialQuotes, "bubbleTapAdvance": bubbleTapAdvance, "language": language.rawValue,
             "desktopTopmost": desktopTopmost, "soundOn": soundOn, "hideMenu": hideMenu, "taskCompletionBubble": completionEnabled]
+        values["lowQuotaEnabled"] = lowQuotaEnabled
+        values["lowQuotaQuote"] = Quote(text: lowQuotaQuote).valid ? lowQuotaQuote : "需要重置……"
+        values["normalCharacter"] = characterImages.names[.normal]
+        values["lowCharacter"] = characterImages.names[.low]
+        values["menuBarOnly"] = menuBarOnly
+        values["hideInFullscreen"] = hideInFullscreen
+        values["easterEggsEnabled"] = easterEggsEnabled
+        values["squishEnabled"] = squishEnabled
+        values["danceEnabled"] = danceEnabled
+        values["squishLoops"] = squishLoops
+        values["danceLoops"] = danceLoops
         values.merge(current) { _, new in new }
         values["desktopLeft"] = desktopLeft; values["desktopBottom"] = desktopBottom
         try? writeJSON(values, to: file)
@@ -402,6 +483,7 @@ final class WidgetModel: ObservableObject {
     }
     func showQuota() {
         onManualBubble?(); isCompletionMessage = false
+        showingLowQuotaQuote = false
         let opening = !bubble
         let switching = message != nil
         message = nil; bubble = true
@@ -409,7 +491,57 @@ final class WidgetModel: ObservableObject {
         restartTTL(delay: opening ? 0.52 : switching ? 0.28 : 0)
         if opening { requestRefreshFlag() }
     }
-    func characterClick() {
+    func easterEggURL(_ egg: EasterEgg) -> URL {
+        Bundle.module.resourceURL!.appendingPathComponent("WebWidget").appendingPathComponent(egg.filename)
+    }
+    func easterEggImage(_ egg: EasterEgg) -> NSImage? { NSImage(contentsOf: easterEggURL(egg)) }
+    func loopCount(_ egg: EasterEgg) -> Int { min(10, max(0, egg == .squish ? squishLoops : danceLoops)) }
+    func eggEnabled(_ egg: EasterEgg) -> Bool { easterEggsEnabled && (egg == .squish ? squishEnabled : danceEnabled) }
+    func saveEasterEggPreferences() { finishEasterEgg(); savePreferences() }
+    func finishEasterEgg() {
+        easterEggWork?.cancel(); easterEggWork = nil
+        easterEgg = nil
+    }
+    @discardableResult func playEasterEgg(_ egg: EasterEgg) -> Bool {
+        guard eggEnabled(egg), FileManager.default.fileExists(atPath: easterEggURL(egg).path) else { return false }
+        finishEasterEgg(); onManualBubble?(); isCompletionMessage = false
+        easterEggGeneration += 1
+        let generation = easterEggGeneration
+        easterEgg = egg
+        let loops = loopCount(egg)
+        if egg == .dance { scheduleDanceCycle(remaining: loops); return true }
+        if loops == 0 { return true }
+        let work = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                guard let self, self.easterEggGeneration == generation else { return }
+                self.finishEasterEgg()
+            }
+        }
+        easterEggWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + egg.duration * Double(loops) + 0.06, execute: work)
+        return true
+    }
+    private func scheduleDanceCycle(remaining: Int) {
+        let generation = easterEggGeneration
+        let work = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                guard let self, self.easterEgg == .dance, self.easterEggGeneration == generation else { return }
+                if remaining == 1 { self.finishEasterEgg(); return }
+                // The GIF contains one cycle. Reload it only when another
+                // user-selected cycle is due, including continuous playback.
+                self.easterEggGeneration += 1
+                self.scheduleDanceCycle(remaining: max(0, remaining - 1))
+            }
+        }
+        easterEggWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + EasterEgg.dance.duration + 0.05, execute: work)
+    }
+    func characterClick(draw: Double = Double.random(in: 0..<1)) {
+        if easterEgg != nil { finishEasterEgg(); showQuota(); return }
+        let danceAvailable = FileManager.default.fileExists(atPath: easterEggURL(.dance).path)
+        if easterEggsEnabled,
+           let egg = EasterEgg.select(draw: draw, danceAvailable: danceAvailable, squishEnabled: squishEnabled, danceEnabled: danceEnabled),
+           playEasterEgg(egg) { return }
         if bubble && bubbleTapAdvance { clickBubble() } else { showQuota() }
     }
     private func requestRefreshFlag() {
@@ -419,12 +551,15 @@ final class WidgetModel: ObservableObject {
         onManualBubble?(); isCompletionMessage = false
         let opening = !bubble
         loadQuotes()
-        message = QuoteFile.choose(quotes, excluding: lastQuote) ?? "我在這裡，慢慢來就好。"
-        lastQuote = message; bubble = true
+        showingLowQuotaQuote = isLowQuota
+        message = isLowQuota ? (Quote(text: lowQuotaQuote).valid ? lowQuotaQuote : "需要重置……") : QuoteFile.choose(quotes, excluding: lastQuote) ?? "我在這裡，慢慢來就好。"
+        if isLowQuota { pendingLowQuotaNotice = false } else { lastQuote = message }
+        bubble = true
         updateAppearance()
         restartTTL(delay: opening ? 0.52 : 0.28)
     }
     func showCompletion() {
+        showingLowQuotaQuote = false
         quoteGeneration += 1; isCompletionMessage = true
         message = "Codex\n" + text("有回复已结束"); bubble = true
         colorScope = .none; sceneStarted = Date().addingTimeInterval(0.52)
@@ -449,7 +584,7 @@ final class WidgetModel: ObservableObject {
     }
     func clickBubble() {
         onManualBubble?(); isCompletionMessage = false
-        if message == nil { showQuote() } else { quoteGeneration += 1; bubble = false; updateAppearance() }
+        if message == nil { showQuote() } else { showingLowQuotaQuote = false; quoteGeneration += 1; bubble = false; updateAppearance() }
     }
     func loadQuotes() {
         let builtin = (try? Data(contentsOf: resources.appendingPathComponent("quotes.json"))).flatMap { try? QuoteFile.decode($0) } ?? []

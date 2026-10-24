@@ -4,16 +4,20 @@ import CoreGraphics
 public enum WidgetPlacement {
     /// Follow the complete host, never its screen intersection. Cropping is a
     /// presentation concern and must not change the saved position or scale.
-    public static func followFrame(host: CGRect, size: CGSize, x: Double, y: Double) -> CGRect? {
+    public static func followFrame(host: CGRect, size: CGSize, x: Double, y: Double, contentBottom: CGFloat? = nil) -> CGRect? {
         guard finite(host), host.width > 0, host.height > 0,
               size.width.isFinite, size.height.isFinite, size.width > 0, size.height > 0,
-              x.isFinite, y.isFinite else { return nil }
+              x.isFinite, y.isFinite,
+              contentBottom.map({ $0.isFinite && $0 >= 0 && $0 <= size.height }) ?? true else { return nil }
         let insetX = min(12, max(0, host.width - size.width))
         let insetY = min(12, max(0, host.height - size.height))
         let horizontal = max(0, host.width - size.width - 24)
-        let vertical = max(0, host.height - size.height - 24)
+        // Anchor visible character pixels, rather than the transparent canvas,
+        // to the host's bottom edge. Keep the full canvas for the quota bubble.
+        let bottom = contentBottom.map { -$0 } ?? insetY
+        let vertical = max(0, host.height - size.height - insetY - bottom)
         let frame = CGRect(x: host.minX + insetX + horizontal * min(1, max(0, x)),
-                           y: host.minY + insetY + vertical * min(1, max(0, y)),
+                           y: host.minY + bottom + vertical * min(1, max(0, y)),
                            width: size.width, height: size.height)
         return finite(frame) ? frame : nil
     }

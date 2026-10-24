@@ -2,6 +2,18 @@ import XCTest
 @testable import GPTNiangCore
 
 final class FollowPlacementTests: XCTestCase {
+    func testVisibleCharacterTouchesHostBottomAtEveryScale() throws {
+        let host = CGRect(x: -900, y: 85, width: 1200, height: 900)
+        for scale in [0.6, 1.0, 2.5] {
+            let bottom = 22.0 * scale
+            let size = CGSize(width: 378 * scale, height: 378 * scale)
+            let frame = try XCTUnwrap(WidgetPlacement.followFrame(host: host, size: size, x: 1, y: 0, contentBottom: bottom))
+            XCTAssertEqual(frame.minY + bottom, host.minY, accuracy: 0.001)
+            XCTAssertEqual(frame.size, size)
+            let moved = try XCTUnwrap(WidgetPlacement.followFrame(host: host.offsetBy(dx: 500, dy: -300), size: size, x: 1, y: 0, contentBottom: bottom))
+            XCTAssertEqual(moved.minY, frame.minY - 300, accuracy: 0.001)
+        }
+    }
     func testFullHostTranslationPreservesSizeAndRelativePosition() throws {
         let host = CGRect(x: 100, y: 100, width: 900, height: 700)
         for scale in [0.6, 1.0, 2.5] {

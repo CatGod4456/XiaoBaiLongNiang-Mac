@@ -1,7 +1,26 @@
 import AppKit
 
+enum WidgetVisibilityPolicy {
+    static func hideForFullscreen(frontmostBundle: String?, companionActive: Bool,
+                                  windows: [CGRect], screens: [CGRect]) -> Bool {
+        guard !companionActive, frontmostBundle != "com.openai.codex" else { return false }
+        return windows.contains { window in
+            window.width > 0 && window.height > 0 && screens.contains { screen in
+                window.insetBy(dx: -2, dy: -2).contains(screen)
+            }
+        }
+    }
+}
+
 /// Decisions independent of WindowServer, so transitions can be regression tested.
 struct WindowFollowPolicy {
+    static func prioritizeMainWindows(_ candidates: [(frame: CGRect, number: Int)]) -> [(frame: CGRect, number: Int)] {
+        candidates.enumerated().sorted { a, b in
+            let first = a.element.frame.width * a.element.frame.height
+            let second = b.element.frame.width * b.element.frame.height
+            return first == second ? a.offset < b.offset : first > second
+        }.map(\.element)
+    }
     static let collectionBehavior: NSWindow.CollectionBehavior = [
         .canJoinAllSpaces, .canJoinAllApplications, .fullScreenAuxiliary,
         .stationary, .ignoresCycle
