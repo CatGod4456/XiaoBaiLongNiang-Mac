@@ -3,6 +3,7 @@
   const $ = id => document.getElementById(id);
   const stage = $('stage'), rows = $('rows'), template = $('quota-row');
   let state = null, rowViews = [], timer = null, revision = -1;
+  let pressStarted = null, releaseTimer = null, pointerHeld = false;
   const format = (pattern, values) => values.reduce((s, v) => s.replace('%@', String(v)), pattern);
   function action(name) {
     const bridge = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.widget;
@@ -10,6 +11,37 @@
     else window.dispatchEvent(new CustomEvent('widget-action', {detail: name}));
   }
   function number(value, fallback = 0) { return typeof value === 'number' && Number.isFinite(value) ? value : fallback; }
+  function pressOptions() {
+    const speed = Math.max(.5, Math.min(3, number(state && state.pressSpeed, 1)));
+    return {speed, immediate: !!(state && state.pressImmediate)};
+  }
+  function clearPress() {
+    if (releaseTimer !== null) clearTimeout(releaseTimer);
+    releaseTimer = null; pressStarted = null; pointerHeld = false;
+    stage.classList.remove('pressed');
+  }
+  function press(down) {
+    if (releaseTimer !== null) { clearTimeout(releaseTimer); releaseTimer = null; }
+    if (down) {
+      if (state && state.egg) return;
+      pointerHeld = true; pressStarted = Date.now();
+      stage.classList.add('pressed');
+      return;
+    }
+    pointerHeld = false;
+    if (pressStarted === null) return;
+    const options = pressOptions();
+    // A trackpad tap can deliver both events before a frame is painted. Keep
+    // the pressed target long enough to reach it, then allow a full rebound.
+    const attack = options.immediate ? 0 : 140 / options.speed;
+    const visibleHold = Math.max(40, 50 / options.speed);
+    const remaining = Math.max(0, pressStarted + attack + visibleHold - Date.now());
+    if (remaining === 0) { clearPress(); return; }
+    releaseTimer = setTimeout(() => {
+      releaseTimer = null;
+      if (!pointerHeld) clearPress();
+    }, remaining);
+  }
   function percentage(value) { return Number(value.toFixed(1)).toString() + '%'; }
   function updateClock() {
     if (!state || !state.bubble || state.message !== null) return;
@@ -48,9 +80,13 @@
     state = next;
     state.message = typeof next.message === 'string' ? next.message : null;
     const labels = state.labels || {};
+    const pressConfig = pressOptions();
+    stage.style.setProperty('--press-in', (pressConfig.immediate ? 0 : 140 / pressConfig.speed) + 'ms');
+    stage.style.setProperty('--press-out', (200 / pressConfig.speed) + 'ms');
     stage.classList.toggle('bubble-open', !!state.bubble);
     stage.classList.toggle('is-low', !!state.low);
     const egg = state.egg === 'squish' || state.egg === 'dance' ? state.egg : null;
+    if (egg) clearPress();
     stage.classList.toggle('is-easter-egg', egg !== null);
     stage.classList.toggle('egg-squish', egg === 'squish');
     const eggLoops = Math.max(0, Math.min(10, Math.floor(number(state.eggLoops, 1))));
@@ -102,9 +138,9 @@
     startClock();
   }
   $('character').addEventListener('click', () => action('character'));
-  $('character').addEventListener('pointerdown', () => stage.classList.add('pressed'));
-  document.addEventListener('pointerup', () => stage.classList.remove('pressed'));
-  document.addEventListener('pointercancel', () => stage.classList.remove('pressed'));
+  $('character').addEventListener('pointerdown', () => press(true));
+  document.addEventListener('pointerup', () => press(false));
+  document.addEventListener('pointercancel', clearPress);
   $('character').addEventListener('pointerenter', () => stage.classList.add('hovered'));
   $('stage').addEventListener('pointerleave', () => stage.classList.remove('hovered'));
   $('settings').addEventListener('click', () => action('settings'));
@@ -112,10 +148,10 @@
   $('quota').addEventListener('click', event => { if (!event.target.closest('#refresh')) action('bubble'); });
   $('message').addEventListener('click', () => action('bubble'));
   document.querySelectorAll('.cloud,.thought').forEach(view => view.addEventListener('click', () => action('bubble')));
-  document.addEventListener('visibilitychange', startClock);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) clearPress(); startClock(); });
   window.GPTNiang = Object.freeze({
     render,
-    press: down => stage.classList.toggle('pressed', !!down),
+    press,
     hover: value => stage.classList.toggle('hovered', !!value)
   });
   action('ready');

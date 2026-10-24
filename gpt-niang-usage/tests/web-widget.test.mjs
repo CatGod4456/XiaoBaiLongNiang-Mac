@@ -32,23 +32,25 @@ function fixture() {
     return row;
   }};
   const images = {'.portrait.normal':new Element(),'.portrait.low':new Element()};
-  const actions = [], timers = new Map(), docEvents = {}; let time = 1000000, nextTimer = 0;
+  const actions = [], timers = new Map(), timeouts = new Map(), docEvents = {}; let time = 1000000, nextTimer = 0;
   const document = {getElementById: id => ids[id], querySelector: selector => images[selector],
     querySelectorAll: () => [new Element(),new Element(),new Element()], hidden:false,
     addEventListener: (name, callback) => { docEvents[name] = callback; }};
   const window = {webkit:{messageHandlers:{widget:{postMessage: value => actions.push(value.action)}}}};
   vm.runInNewContext(script, {document,window,Date:{now:()=>time},
     setInterval: callback => {const id=++nextTimer;timers.set(id,callback);return id;},
-    clearInterval: id => timers.delete(id)});
+    clearInterval: id => timers.delete(id),
+    setTimeout: (callback, delay) => {const id=++nextTimer;timeouts.set(id,{callback,at:time+delay});return id;},
+    clearTimeout: id => timeouts.delete(id)});
   const state = overrides => ({
     bubble:true,message:null,low:false,scale:1,mirrored:false,hideMenu:false,revision:0,
     colorScope:'none',colorPaused:false,refreshing:false,title:'剩余额度',plan:'Pro',error:'不可用',
     stale:false,observedAt:time,windows:[{title:'5 小时',remaining:76,resetsAt:time+3600000,resetText:'稍后重置'}],
     labels:{stale:'旧快照',wait:'等待更新',minutes:'%@ 分钟后重置',hours:'%@ 小时 %@ 分钟后重置'},...overrides
   });
-  return {ids,images,actions,timers,document,state,
+  return {ids,images,actions,timers,timeouts,document,state,press: down => window.GPTNiang.press(down),
     render: overrides => window.GPTNiang.render(state(overrides)),
-    tick: value => {time=value;for(const callback of timers.values())callback();},
+    tick: value => {time=value;for(const [id,item] of timeouts)if(item.at<=time){timeouts.delete(id);item.callback();}for(const callback of timers.values())callback();},
     visibility: hidden => {document.hidden=hidden;docEvents.visibilitychange();}};
 }
 test('renderer updates quota, progress, language text and a correlated refresh action',()=>{
@@ -58,6 +60,37 @@ test('renderer updates quota, progress, language text and a correlated refresh a
   assert.equal(row.parts['.fill'].style.width,'76%');
   f.ids.refresh.events.click({stopPropagation(){}});
   assert.deepEqual(f.actions,['ready','refresh']);
+});
+test('a same-frame trackpad tap retains a visible press before completing the rebound',()=>{
+  const f=fixture();f.render();
+  f.press(true);f.press(false);
+  assert.ok(f.ids.stage.classes.has('pressed'));
+  f.tick(1000050);assert.ok(f.ids.stage.classes.has('pressed'));
+  f.tick(1001000);assert.ok(!f.ids.stage.classes.has('pressed'));
+  assert.equal(f.timeouts.size,0);
+});
+test('long presses stay down, and rapid taps replace the pending release instead of queuing',()=>{
+  const f=fixture();f.render();f.press(true);
+  f.tick(1001000);assert.ok(f.ids.stage.classes.has('pressed'));
+  f.press(false);assert.ok(!f.ids.stage.classes.has('pressed'));
+  f.press(true);f.press(false);f.tick(1001100);
+  f.press(true);f.press(false);
+  assert.equal(f.timeouts.size,1);
+  f.tick(1001200);assert.ok(f.ids.stage.classes.has('pressed'));
+  f.tick(1002000);assert.ok(!f.ids.stage.classes.has('pressed'));
+});
+test('speed and immediate-entry options still finish short taps and leave no stuck press',()=>{
+  const f=fixture();f.render({pressSpeed:2,pressImmediate:true});
+  assert.equal(f.ids.stage.style['--press-in'],'0ms');
+  assert.equal(f.ids.stage.style['--press-out'],'100ms');
+  f.press(true);f.press(false);f.tick(1000020);
+  assert.ok(f.ids.stage.classes.has('pressed'));
+  f.tick(1000100);assert.ok(!f.ids.stage.classes.has('pressed'));
+  f.render({pressSpeed:0});assert.equal(f.ids.stage.style['--press-in'],'280ms');
+  f.press(true);f.press(false);f.visibility(true);
+  assert.ok(!f.ids.stage.classes.has('pressed'));assert.equal(f.timeouts.size,0);
+  f.visibility(false);f.press(true);f.press(false);f.render({egg:'dance'});
+  assert.ok(!f.ids.stage.classes.has('pressed'));assert.equal(f.timeouts.size,0);
 });
 test('low image, dedicated quote and confirmed normal rendering switch together',()=>{
   const f=fixture();f.render({low:true,message:'需要重置……'});

@@ -153,6 +153,7 @@ final class WidgetAssetHandler: NSObject, WKURLSchemeHandler {
             "completion": model.isCompletionMessage, "low": model.isLowQuota,
             "mirrored": model.facingLeft, "scale": model.displayScale, "hideMenu": model.hideMenu,
             "revision": model.characterRevision, "refreshing": model.refreshing,
+            "pressSpeed": model.pressAnimationSpeed, "pressImmediate": model.pressImmediate,
             "egg": webValue(model.easterEgg?.rawValue), "eggGeneration": model.easterEggGeneration,
             "eggLoops": model.easterEgg.map { model.loopCount($0) } ?? 1,
             "characterBaseline": view.characterBaseline,

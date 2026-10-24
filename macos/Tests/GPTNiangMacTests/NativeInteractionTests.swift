@@ -101,11 +101,14 @@ final class NativeInteractionTests: XCTestCase {
         let model = WidgetModel(dataDirectory: data, resources: data)
         XCTAssertEqual(model.language, .system)
         model.language = .simplified
+        XCTAssertEqual(model.pressAnimationSpeed, 1); XCTAssertFalse(model.pressImmediate)
+        model.pressAnimationSpeed = 2.5; model.pressImmediate = true
         model.desktopTopmost = true; model.desktopLeft = -500; model.desktopBottom = 200; model.soundOn = false; model.hideMenu = true
         model.specialQuotes = "我的繁體語錄"; model.volume = 0.4; model.followCodex = false
         model.savePreferences()
         let restored = WidgetModel(dataDirectory: data, resources: data)
         XCTAssertEqual(restored.language, .simplified)
+        XCTAssertEqual(restored.pressAnimationSpeed, 2.5); XCTAssertTrue(restored.pressImmediate)
         XCTAssertEqual(restored.specialQuotes, "我的繁體語錄"); XCTAssertEqual(restored.volume, 0.4)
         XCTAssertFalse(restored.followCodex)
         XCTAssertTrue(restored.desktopTopmost); XCTAssertEqual(restored.desktopLeft, -500)

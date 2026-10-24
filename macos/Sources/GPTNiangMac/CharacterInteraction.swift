@@ -1,7 +1,7 @@
 import SwiftUI
 import AppKit
 
-// AppKit handles pointer capture across a moving NSPanel. SwiftUI owns animation.
+// AppKit captures pointer events across a moving NSPanel; the view renders feedback.
 struct CharacterInteraction: NSViewRepresentable {
     var onPress: (Bool) -> Void
     var onDrag: (CGSize) -> Void

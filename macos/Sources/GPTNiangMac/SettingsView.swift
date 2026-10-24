@@ -18,6 +18,18 @@ struct SettingsView: View {
             section1
             section2
             section3
+            GroupBox("点击动画") {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("动画速度")
+                        Slider(value: $model.pressAnimationSpeed, in: 0.5...3, step: 0.25)
+                        Text(String(format: "%.2g×", model.pressAnimationSpeed)).frame(width: 42)
+                    }
+                    Toggle("按下时立即到达压缩姿态", isOn: $model.pressImmediate)
+                    Text("触摸板轻点也会播完压下、回弹。开启此项后立即压下，松开仍会回弹；不改变彩蛋概率。")
+                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }.padding(10)
+            }
             characterSection
             GroupBox("彩蛋") {
                 VStack(alignment: .leading, spacing: 10) {
@@ -54,6 +66,8 @@ struct SettingsView: View {
         .onChange(of: model.language) { _ in model.savePreferences() }
         .onChange(of: model.desktopTopmost) { _ in model.savePreferences() }
         .onChange(of: model.soundOn) { _ in model.audio.updateVolume(); model.savePreferences() }
+        .onChange(of: model.pressAnimationSpeed) { _ in model.savePreferences() }
+        .onChange(of: model.pressImmediate) { _ in model.savePreferences() }
         .onChange(of: model.hideMenu) { _ in model.savePreferences() }
         .onChange(of: model.completionEnabled) { _ in model.savePreferences() }
         .onChange(of: model.scale) { _ in model.savePreferences() }

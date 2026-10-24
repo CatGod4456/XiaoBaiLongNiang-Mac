@@ -6,6 +6,8 @@ https://space.bilibili.com/4168597/
 应用图标由普通立绘制作。低额度形象来源另见 low-quota-SOURCE.txt。
 跳舞素材来源：这个刀子真甜，《大肥鱼一键跟跳》，Bilibili UID 23315338
 https://www.bilibili.com/video/BV1ovpE66Es8/
+跳舞片段已获视频作者同意用于本项目彩蛋并随源码／安装包分发，保留署名与链接。
+具体用途范围见 ASSET-PERMISSIONS.md；此同意不扩大为原角色设计或其他素材的统一授权。
 完整来源、加工方式和代码关系见包内 CREDITS.md 或仓库 docs/CREDITS.md。
 本节说明当前定制素材；下文保留上游素材声明。当前普通立绘的来源以
 USER-CHARACTER-SOURCE.txt 为准，不把本版用户提供原图写成上游生成图。

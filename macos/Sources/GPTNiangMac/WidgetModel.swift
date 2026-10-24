@@ -45,6 +45,8 @@ final class WidgetModel: ObservableObject {
     @Published var desktopLeft: Double?
     @Published var desktopBottom: Double?
     @Published var soundOn: Bool
+    @Published var pressAnimationSpeed: Double
+    @Published var pressImmediate: Bool
     @Published var hideMenu: Bool
     @Published var completionEnabled = false
     @Published var isCompletionMessage = false
@@ -157,6 +159,8 @@ final class WidgetModel: ObservableObject {
         desktopLeft = values["desktopLeft"] as? Double
         desktopBottom = values["desktopBottom"] as? Double
         soundOn = values["soundOn"] as? Bool ?? true
+        pressAnimationSpeed = min(3, max(0.5, values["pressAnimationSpeed"] as? Double ?? 1))
+        pressImmediate = values["pressImmediate"] as? Bool ?? false
         hideMenu = values["hideMenu"] as? Bool ?? false
         completionEnabled = values["taskCompletionBubble"] as? Bool ?? false
         easterEggsEnabled = values["easterEggsEnabled"] as? Bool ?? true
@@ -471,6 +475,8 @@ final class WidgetModel: ObservableObject {
         values["danceEnabled"] = danceEnabled
         values["squishLoops"] = squishLoops
         values["danceLoops"] = danceLoops
+        values["pressAnimationSpeed"] = min(3, max(0.5, pressAnimationSpeed))
+        values["pressImmediate"] = pressImmediate
         values.merge(current) { _, new in new }
         values["desktopLeft"] = desktopLeft; values["desktopBottom"] = desktopBottom
         try? writeJSON(values, to: file)

@@ -64,6 +64,31 @@ final class WebWidgetTests: XCTestCase {
         let active = try await view.browser.evaluateJavaScript("document.getElementById('stage').classList.contains('is-easter-egg')")
         XCTAssertEqual(active as? Bool, false)
     }
+    @MainActor func testTrackpadTapCompletesPressAndReceivesSavedAnimationOptions() async throws {
+        _ = NSApplication.shared
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let model = WidgetModel(dataDirectory: root, resources: root)
+        let coordinator = WidgetWebCoordinator(model: model), view = coordinator.makeView()
+        defer { coordinator.stop() }
+        for _ in 0..<100 {
+            if model.webViewReady { break }
+            try await Task.sleep(nanoseconds: 50_000_000)
+        }
+        XCTAssertTrue(model.webViewReady)
+        let held = try await view.browser.evaluateJavaScript("window.GPTNiang.press(true); window.GPTNiang.press(false); document.getElementById('stage').classList.contains('pressed')")
+        XCTAssertEqual(held as? Bool, true, "Even same-frame down/up must reach a visible pressed state.")
+        var released = false
+        for _ in 0..<100 {
+            try await Task.sleep(nanoseconds: 25_000_000)
+            let active = try await view.browser.evaluateJavaScript("document.getElementById('stage').classList.contains('pressed')")
+            if active as? Bool == false { released = true; break }
+        }
+        XCTAssertTrue(released, "A short tap must rebound and finish without another click.")
+        model.pressAnimationSpeed = 2; model.pressImmediate = true; coordinator.update()
+        let duration = try await view.browser.evaluateJavaScript("document.getElementById('stage').style.getPropertyValue('--press-in')")
+        XCTAssertEqual(duration as? String, "0ms")
+    }
     func testBridgeRejectsUnlistedCommandsAndExtraArguments() {
         XCTAssertEqual(WidgetWebPolicy.action(["action": "refresh"]), "refresh")
         XCTAssertNil(WidgetWebPolicy.action(["action": "exec", "command": "id"]))
