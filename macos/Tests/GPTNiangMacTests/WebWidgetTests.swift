@@ -63,7 +63,7 @@ final class WebWidgetTests: XCTestCase {
             if model.webViewReady { break }
             try await Task.sleep(nanoseconds: 50_000_000)
         }
-        for (egg, expected) in [(EasterEgg.dance, 480), (.zero, 500)] {
+        for (egg, expected) in [(EasterEgg.dance, 950), (.zero, 500)] {
             XCTAssertTrue(model.playEasterEgg(egg))
             coordinator.update()
             var width = 0

@@ -41,19 +41,25 @@ struct SettingsView: View {
                             .disabled(!model.squishEnabled)
                     }.disabled(!model.easterEggsEnabled)
                     HStack {
-                        Toggle("小龙娘跳舞", isOn: $model.danceEnabled)
+                        Toggle("兔兔跳舞（原版）", isOn: $model.danceEnabled)
                         loopPicker($model.danceLoops)
                         Button("预览") { model.playEasterEgg(.dance) }
                             .disabled(!model.danceEnabled || !FileManager.default.fileExists(atPath: model.easterEggURL(.dance).path))
                     }.disabled(!model.easterEggsEnabled)
                     HStack {
-                        Toggle("零额度彩蛋", isOn: $model.zeroEnabled)
+                        Toggle("零额度拳击（原版）", isOn: $model.zeroEnabled)
                         loopPicker($model.zeroLoops)
                         Button("预览") { model.playEasterEgg(.zero) }
                             .disabled(!model.zeroEnabled || !FileManager.default.fileExists(atPath: model.easterEggURL(.zero).path))
                     }.disabled(!model.easterEggsEnabled)
                     Text("平时前两种各 2.5%；有效额度为 0 时，三种各约 1.67%，合计最多 5%。每次独立抽取、不累积，关闭一种不转移概率。零额度彩蛋的预览不受额度限制；再次点击人物可停止。")
                         .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    HStack {
+                        Link("动图作者：疚刃", destination: URL(string: "https://space.bilibili.com/107716290/")!)
+                        Spacer()
+                        Link("跳舞来源", destination: URL(string: "https://www.bilibili.com/video/BV16Vap6yEGP/")!)
+                        Link("拳击来源", destination: URL(string: "https://www.bilibili.com/video/BV1SZpR6hEcv/")!)
+                    }.font(.caption)
                 }.padding(10)
             }
             section4

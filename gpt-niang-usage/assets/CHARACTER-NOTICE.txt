@@ -1,6 +1,4 @@
-当前更新：跳舞已替换为基于维护者另行提供的 140 帧 GIF 动作参考、由 ImageGen 重绘关键帧并按时间轴逐格显示的白发版本。零额度拳击也按维护者提供的 98 帧 GIF 动作参考重绘为白发龙娘，当前两段均额外补绘 24 张 ImageGen 过渡姿势，按时间轴逐格显示，输出约 24 fps：跳舞 168 帧／7 秒，拳击 235 帧／9.8 秒。此为 AI 重绘与逐格保持，不宣称每帧独立手绘。这两份新参考／动图的原作者与公开许可待确认；下文早期视频的项目用途同意不自动适用于它们。详见 CREDITS.md 与 ASSET-PERMISSIONS.md。
-
-本定制版的当前素材来源 / Current custom-build provenance
+当前更新：跳舞与零额度拳击已替换为维护者提供的兔兔原版 GIF，作者为疚刃（Bilibili UID 107716290）。跳舞来源 https://www.bilibili.com/video/BV16Vap6yEGP/ ，70 帧／7 秒；拳击来源 https://www.bilibili.com/video/BV1SZpR6hEcv/ ，98 帧／9.8 秒。保留原尺寸、原画面与每帧 100 毫秒延时；App 副本只去掉无限循环标记，由用户设置决定次数。未 AI 重绘或补帧。已按维护者要求加入本机与私有测试包，公开分发授权由维护者自行询问中。代码 MIT 不覆盖这些动图；早期素材许可不自动适用。详见 CREDITS.md 与 ASSET-PERMISSIONS.md。
 
 角色形象来源（用户提供出处）：ZipZipPipe，Bilibili UID 4168597
 https://space.bilibili.com/4168597/

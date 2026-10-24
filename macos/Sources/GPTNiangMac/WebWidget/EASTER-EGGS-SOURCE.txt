@@ -1,17 +1,25 @@
-CANDIDATE ORIGINAL ANIMATION SOURCES PROVIDED 2026-10-24
-https://www.bilibili.com/video/BV1SZpR6hEcv/
+CURRENT ORIGINAL ANIMATIONS — 2026-10-24
+
+Creator: 疚刃, Bilibili UID 107716290
+https://space.bilibili.com/107716290/
+Dance: 若不是你突然闯进我生活
 https://www.bilibili.com/video/BV16Vap6yEGP/
-The maintainer is asking the creators for permission. No approval is recorded yet. Dance and boxing production/publication are paused; the current selected feature is the spring/stretch egg. These links document candidate original assets for the proposed direct-use plan; they do not retroactively change earlier AI-redrawing provenance.
+70 frames, 950x950, 100 ms per frame, 7 seconds.
+Original SHA-256: f98154e870a2ff26af1b5840eb963204f6f17e0e6a54688982850c7f95a977cf
 
-CURRENT ANIMATION TIMING UPDATE
+Zero-quota boxing: 我小兔子也绝非善类
+https://www.bilibili.com/video/BV1SZpR6hEcv/
+98 frames, 500x406, 100 ms per frame, 9.8 seconds.
+Original SHA-256: 67c104c3613ba633180d8bcb7f067fffbb5f654f7bd724292fc3187005ac1e72
+The boxing video description additionally credits the motion to 抖音渝欢.
 
-Selected export: approximately 24 fps with held drawn poses. Dance is 168 GIF frames / 7 seconds; zero-quota boxing is 235 GIF frames / 9.8 seconds. GIF delays are 40 or 50 ms, summing to the exact original duration. File frame counts include intentional repeated exposures; they are not counts of independent hand drawings. No neural optical-flow interpolation, morphing or whole-image affine motion tween is used in the selected export.
+Both original GIFs were provided by the maintainer. The app copies remove only the NETSCAPE infinite-loop extension; every encoded frame, transparency, dimension and delay is retained. Decoded RGBA pixels were checked against every original frame. No AI redraw, interpolation, recrop, resize or foreground extraction is used. The showcase GIFs are byte-identical originals.
 
-Both animations retain their original user-provided motion references (140 frames / 7 seconds for dance, 98 frames / 9.8 seconds for boxing). White dragon design preserves long gown, both curved segmented horns, temple ornament and scaled tail. The standing/walking sheet is appearance reference only. Each animation received 24 additional ImageGen transition-pose drawings, retained in docs/media/dance-inbetweens.png and zero-inbetweens.png. Clean back-facing poses are selected throughout the dance back shot. See docs/media/MOTION-PROCESS.md and inbetween-prompt.txt.
+The maintainer explicitly requested local/private-package inclusion and activation. Public distribution permission is being requested by the maintainer; no creator approval is recorded yet. Repository remains private and Release remains a draft. Code MIT does not relicense third-party characters or animations.
 
-The App GIFs have no intrinsic infinite-loop metadata. Default dance and zero each one cycle; stretch remains three cycles. All have individual switches and 1-10 / continuous-loop controls. Normal quota: stretch and dance each 2.5%. Confirmed current exact zero quota: all three occupy 5% / 3 each. Disabled/missing slots are not transferred; draws do not accumulate; clicking stops current playback.
+Playback: spring/stretch unchanged; dance and zero default to one cycle, with individual switches and 1-10 or continuous-loop controls. Normal quota: stretch and dance each 2.5%. Confirmed current exact zero quota: all three occupy 5% / 3 each. Disabled/missing slots are not transferred; draws do not accumulate. Clicking stops current playback.
 
-Motion reference author/public distribution permission remain unconfirmed. Do not extend the earlier video's project-specific permission to these new references. Character design attribution and earlier provenance below remain preserved.
+The preceding white-dragon AI redraws are no longer selected. Historical keyframes, inbetweens and prompts remain in the repository as an unused production record. See docs/media/MOTION-PROCESS.md.
 
 EARLIER VERSION PROVENANCE (retained historical record; the earlier dance below is replaced)
 
