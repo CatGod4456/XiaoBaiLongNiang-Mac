@@ -1,12 +1,12 @@
 # 小白龙娘 · macOS WebView 改进版 1.14
 
-> 发布准备中：仓库与 Release 保持私有草稿。两份原版动图已按维护者确认记录本项目用途授权；来源、主要贡献和图标制作分别署名，公开时机由维护者确认。
+> 1.14 正式发布。两份原版动图已按维护者确认记录本项目用途授权；来源、主要贡献和图标制作分别署名。
 
 本项目是非官方的 Codex 额度挂件，与 OpenAI 无隶属、赞助或背书关系。
 
 基于 [T7moris/GPT-Niang v1.3.5](https://github.com/T7moris/GPT-Niang/tree/v1.3.5) 的 Mac 定制改进版：查看 Codex 剩余额度、桌面龙娘、低额度形象与可设置的点击彩蛋。
 
-[查看发布草稿](https://github.com/CatGod4456/XiaoBaiLongNiang-Mac/releases) · [更新公告](docs/RELEASE-1.14.md) · [来源与致谢](docs/CREDITS.md) · [上游项目](https://github.com/T7moris/GPT-Niang)
+[下载正式版本](https://github.com/CatGod4456/XiaoBaiLongNiang-Mac/releases) · [更新公告](docs/RELEASE-1.14.md) · [来源与致谢](docs/CREDITS.md) · [上游项目](https://github.com/T7moris/GPT-Niang)
 
 主体应用代码来自 **T7moris/GPT-Niang**，原生 Mac 移植主要来自 **meaqua9420**，角色形象来源为 **ZipZipPipe**，早期跳舞素材引用 **这个刀子真甜**，当前跳舞与拳击采用用户提供的疚刃原版 GIF。本仓库独立创建并保留上游历史，记录的是我在实际 Mac 使用反馈基础上做的细节改进；本次更新使用 **Codex 辅助生成、修改和验证**。
 
