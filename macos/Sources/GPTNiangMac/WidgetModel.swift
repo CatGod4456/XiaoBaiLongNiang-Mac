@@ -498,7 +498,7 @@ final class WidgetModel: ObservableObject {
         if opening { requestRefreshFlag() }
     }
     func easterEggURL(_ egg: EasterEgg) -> URL {
-        Bundle.module.resourceURL!.appendingPathComponent("WebWidget").appendingPathComponent(egg.filename)
+        WidgetResources.bundle.resourceURL!.appendingPathComponent("WebWidget").appendingPathComponent(egg.filename)
     }
     func easterEggImage(_ egg: EasterEgg) -> NSImage? { NSImage(contentsOf: easterEggURL(egg)) }
     func loopCount(_ egg: EasterEgg) -> Int { min(10, max(0, egg == .squish ? squishLoops : danceLoops)) }

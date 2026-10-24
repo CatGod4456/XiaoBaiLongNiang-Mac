@@ -4,6 +4,20 @@ import GPTNiangCore
 @testable import GPTNiangMac
 
 final class WebWidgetTests: XCTestCase {
+    func testPackagedWebResourcesArePreferredOverTheBuildTree() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let app = root.appendingPathComponent("Fixture.app"), contents = app.appendingPathComponent("Contents")
+        let resources = contents.appendingPathComponent("Resources")
+        try FileManager.default.createDirectory(at: resources, withIntermediateDirectories: true)
+        let metadata = ["CFBundleIdentifier": "test.gpt-niang.packaged-resources", "CFBundlePackageType": "APPL"]
+        try PropertyListSerialization.data(fromPropertyList: metadata, format: .xml, options: 0)
+            .write(to: contents.appendingPathComponent("Info.plist"))
+        let packaged = resources.appendingPathComponent("GPTNiangMac_GPTNiangMac.bundle")
+        try FileManager.default.copyItem(at: WidgetResources.bundle.bundleURL, to: packaged)
+        let parent = try XCTUnwrap(Bundle(url: app))
+        XCTAssertEqual(WidgetResources.resolve(in: parent).bundleURL.standardizedFileURL, packaged.standardizedFileURL)
+    }
     @MainActor func testLowQuoteSurvivesFailureAndClearsOnlyOnConfirmedRecovery() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

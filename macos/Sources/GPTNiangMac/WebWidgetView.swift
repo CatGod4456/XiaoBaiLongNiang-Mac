@@ -3,6 +3,17 @@ import AppKit
 import WebKit
 import GPTNiangCore
 
+enum WidgetResources {
+    static let bundle = resolve(in: .main)
+    static func resolve(in parent: Bundle) -> Bundle {
+        // SwiftPM's generated accessor otherwise falls back to the build tree.
+        // Packaged apps keep their resource bundles in Contents/Resources.
+        let packaged = parent.url(forResource: "GPTNiangMac_GPTNiangMac", withExtension: "bundle")
+            .flatMap(Bundle.init(url:))
+        return packaged ?? Bundle.module
+    }
+}
+
 /// WebKit owns drawing only. Native code owns quota, images, input and windows.
 @MainActor struct WidgetView: NSViewRepresentable {
     @ObservedObject var model: WidgetModel
@@ -85,7 +96,7 @@ final class WidgetAssetHandler: NSObject, WKURLSchemeHandler {
     private var imageRevision = -1
     init(model: WidgetModel) { self.model = model }
     func makeView() -> WidgetWebContainer {
-        let root = Bundle.module.resourceURL!.appendingPathComponent("WebWidget", isDirectory: true)
+        let root = WidgetResources.bundle.resourceURL!.appendingPathComponent("WebWidget", isDirectory: true)
         let handler = WidgetAssetHandler(root: root, normal: model.characterImages.url(.normal), low: model.characterImages.url(.low))
         assets = handler
         let config = WKWebViewConfiguration()
