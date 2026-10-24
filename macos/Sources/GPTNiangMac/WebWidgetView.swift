@@ -64,7 +64,7 @@ final class WidgetAssetHandler: NSObject, WKURLSchemeHandler {
     func resource(_ url: URL) -> (URL, String)? {
         guard url.scheme == "gpt-niang", url.host == "widget", url.user == nil, url.password == nil,
               url.port == nil, url.fragment == nil else { return nil }
-        if ["/normal.png", "/low.png", "/egg-squish.png", "/egg-dance.gif"].contains(url.path) {
+        if ["/normal.png", "/low.png", "/egg-squish.png", "/egg-dance.gif", "/egg-zero.gif"].contains(url.path) {
             if let query = url.query, query.range(of: #"^revision=[0-9]+$"#, options: .regularExpression) == nil { return nil }
             if url.path == "/normal.png" { return (normal, "image/png") }
             if url.path == "/low.png" { return (low, "image/png") }

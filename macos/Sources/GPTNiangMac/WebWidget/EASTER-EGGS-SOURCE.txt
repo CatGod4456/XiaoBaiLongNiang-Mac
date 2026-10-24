@@ -1,3 +1,13 @@
+CURRENT UPDATE, 2026-10-23
+
+Dance replacement: egg-dance.gif now follows the user-provided 140-frame, 7-second blue-character GIF as MOTION REFERENCE ONLY. Character design comes from the user-provided white dragon-girl references: white/lavender long gown, purple eyes, curved segmented horns, temple ornament, and scaled dragon tail. The unrelated standing/walking sprite sheet is appearance reference only; its walking action is not used. ImageGen produced 28 keyframes; per-frame rigid pose changes measured from the reference assemble a 140-frame, 7-second transparent animation. The source atlas is retained at docs/media/dance-keyframes.png. This is AI-assisted redrawing, not pixel-exact 140-frame costume replacement or original animator artwork.
+
+Zero-quota egg: egg-zero.gif retains the user-provided rabbit-eared character and all 98 frames / 9.8 seconds. Only its intrinsic infinite-loop metadata is removed. Author and public redistribution permission for this new attachment and dance reference remain unconfirmed; do not reuse the earlier video permission for them.
+
+Playback: default dance and zero each one cycle; stretch remains three cycles. All have individual switches and 1-10 / continuous-loop controls. Normal quota: stretch and dance each 2.5%. Confirmed current exact zero quota: all three each occupy 5% / 3. Disabled/missing slots are not transferred, draws do not accumulate, and clicking stops current playback.
+
+EARLIER VERSION PROVENANCE (retained historical record; the earlier dance below is replaced)
+
 Easter-egg assets, custom macOS build, 2026-10-23
 
 Normal character: the user-provided image is copied unchanged. See USER-CHARACTER-SOURCE.txt in the main Resources directory.

@@ -85,13 +85,13 @@
     stage.style.setProperty('--press-out', (200 / pressConfig.speed) + 'ms');
     stage.classList.toggle('bubble-open', !!state.bubble);
     stage.classList.toggle('is-low', !!state.low);
-    const egg = state.egg === 'squish' || state.egg === 'dance' ? state.egg : null;
+    const egg = ['squish', 'dance', 'zero'].includes(state.egg) ? state.egg : null;
     if (egg) clearPress();
     stage.classList.toggle('is-easter-egg', egg !== null);
     stage.classList.toggle('egg-squish', egg === 'squish');
     const eggLoops = Math.max(0, Math.min(10, Math.floor(number(state.eggLoops, 1))));
     stage.style.setProperty('--egg-iterations', eggLoops === 0 ? 'infinite' : String(eggLoops));
-    const eggSource = (egg === 'dance' ? 'egg-dance.gif' : 'egg-squish.png') + '?revision=' + Math.max(0, Math.floor(number(state.eggGeneration, 0)));
+    const eggSource = (egg === 'zero' ? 'egg-zero.gif' : egg === 'dance' ? 'egg-dance.gif' : 'egg-squish.png') + '?revision=' + Math.max(0, Math.floor(number(state.eggGeneration, 0)));
     if ($('egg-portrait').getAttribute('src') !== eggSource) $('egg-portrait').setAttribute('src', eggSource);
     stage.classList.toggle('hide-menu', !!state.hideMenu);
     stage.classList.toggle('color-full', state.colorScope === 'full' && !state.completion);

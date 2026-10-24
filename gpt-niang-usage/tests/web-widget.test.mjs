@@ -157,4 +157,8 @@ test('loop controls support finite and continuous stretch, and reload each singl
   assert.equal(f.ids['egg-portrait'].attrs.src,'egg-dance.gif?revision=2');
   f.render({egg:'dance',eggLoops:2,eggGeneration:3});
   assert.equal(f.ids['egg-portrait'].attrs.src,'egg-dance.gif?revision=3');
+  f.render({egg:'zero',eggLoops:1,eggGeneration:4});
+  assert.equal(f.ids['egg-portrait'].attrs.src,'egg-zero.gif?revision=4');
+  assert.ok(f.ids.stage.classes.has('is-easter-egg'));
+  assert.ok(!f.ids.stage.classes.has('egg-squish'));
 });

@@ -1,3 +1,5 @@
+当前更新：跳舞已替换为基于维护者另行提供的 140 帧 GIF 动作参考、由 ImageGen 重绘关键帧并补间合成的白发版本。新增零额度动图暂保留维护者附件原角色。这两份新参考／动图的原作者与公开许可待确认；下文早期视频的项目用途同意不自动适用于它们。详见 CREDITS.md 与 ASSET-PERMISSIONS.md。
+
 本定制版的当前素材来源 / Current custom-build provenance
 
 角色形象来源（用户提供出处）：ZipZipPipe，Bilibili UID 4168597

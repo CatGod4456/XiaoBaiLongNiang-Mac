@@ -1,12 +1,12 @@
 # GPT 娘 · macOS WebView 改进版 1.14
 
-> 发布准备中：当前仓库为私有预览，安装包保存在 Release 草稿。跳舞片段已获视频作者同意用于本项目；其他素材条件分别保留，由维护者确认公开时机。
+> 发布准备中：当前仓库为私有预览，安装包保存在 Release 草稿。早期视频片段的用途许可继续记录；本次新动作参考和零额度动图的出处、公开许可仍需确认，由维护者决定公开时机。
 
 基于 [T7moris/GPT-Niang v1.3.5](https://github.com/T7moris/GPT-Niang/tree/v1.3.5) 的 Mac 定制改进版：查看 Codex 剩余额度、桌面龙娘、低额度形象与可设置的点击彩蛋。
 
-[下载安装包](https://github.com/CatGod4456/GPT-Niang-Mac-WebView/releases/latest) · [来源与致谢](docs/CREDITS.md) · [上游项目](https://github.com/T7moris/GPT-Niang)
+[下载安装包](https://github.com/CatGod4456/GPT-Niang-Mac-WebView/releases/latest) · [更新公告](docs/RELEASE-1.14.md) · [来源与致谢](docs/CREDITS.md) · [上游项目](https://github.com/T7moris/GPT-Niang)
 
-主体应用代码来自 **T7moris/GPT-Niang**，角色形象来源为 **ZipZipPipe**，跳舞素材来自 **这个刀子真甜**。本仓库独立创建并保留上游历史，记录的是我在实际 Mac 使用反馈基础上做的细节改进；本次更新使用 **GPT / Codex 辅助生成、修改和验证**。
+主体应用代码来自 **T7moris/GPT-Niang**，角色形象来源为 **ZipZipPipe**，早期跳舞素材引用 **这个刀子真甜**，当前跳舞按用户提供的另一张 GIF 重绘。本仓库独立创建并保留上游历史，记录的是我在实际 Mac 使用反馈基础上做的细节改进；本次更新使用 **GPT / Codex 辅助生成、修改和验证**。
 
 ![模拟额度状态：正常、低额度和恢复](docs/images/demo-quota.png)
 
@@ -26,22 +26,28 @@
 | 低额度状态 | 任一有效额度窗口低于 5% 时切换低额度形象和台词；有效额度恢复后自动还原 |
 | 图片自定义 | 普通形象与低额度形象分别导入、恢复默认，低额度台词可编辑 |
 | 普通点击动画 | 触摸板轻点也完整压下、回弹；可调 0.5–3 倍速度，或选择立即到达压缩姿态；偏好在重启后保留 |
-| 点击彩蛋 | 坐姿节奏伸缩与透明跳舞动画；各 2.5%，合计最多 5%，每次独立抽取、不累积 |
+| 点击彩蛋 | 坐姿节奏伸缩、重绘跳舞和零额度彩蛋；平时两种各 2.5%，有效额度为 0 时三种均分总计 5%，不累积 |
 | 彩蛋控制 | 总开关、独立开关；各选 1–10 次或持续循环；点击人物可停止 |
 | 独立资源加载 | 网页与彩蛋优先读取 App 内部资源；移开构建资源后仍通过完整启动检查，无需保留源码目录 |
 | 安装 | Apple Silicon 安装包内置经过官方校验的 Node.js，无需另外安装 Node.js |
 
 透明空白区域可穿透点击；气泡收起后，原生窗口会裁到人物范围。桌面显示、跟随模式与原有音量等设置继续保留。
 
-## 效果展示
+## 动画与效果展示
 
 ![模拟菜单栏：正常、低额度、等待数据](docs/images/demo-menubar.png)
 
 ![彩蛋效果与播放设置说明](docs/images/demo-eggs.png)
 
-设置里可以预览两个小彩蛋，也可以独立关闭或调整次数。坐姿图片为 AI 根据角色参考生成；跳舞动作来自原视频，透明背景由后续处理得到。普通立绘由用户提供并保留原图内容，三类来源分别记录在 [CREDITS](docs/CREDITS.md)。
+设置里可以预览三种彩蛋，也可以独立关闭或调整次数。坐姿图片为 AI 根据角色参考生成；当前跳舞以用户提供的 140 帧 GIF 为动作参考，使用 ImageGen 重绘白发龙娘关键帧，再合成为 7 秒透明动画；形象图只用于长裙、龙角、发饰和龙尾等设计参考。零额度彩蛋暂保留用户附件原角色及动作。普通立绘由用户提供并保留原图内容，各类来源分别记录在 [CREDITS](docs/CREDITS.md)。
 
-![普通轻点也完整压下与回弹](docs/media/press.gif)
+| 普通轻点 | 坐姿 stretch |
+| --- | --- |
+| <img src="docs/media/press-character.gif" width="280" alt="完整点按反馈"> | <img src="docs/media/squish-character.gif" width="280" alt="原位伸缩"> |
+
+| 白发龙娘新跳舞 | 零额度彩蛋 |
+| --- | --- |
+| <img src="docs/media/dance.gif" width="360" alt="140帧新跳舞"> | <img src="docs/media/zero.gif" width="280" alt="零额度专属"> |
 
 [点按音效视频](docs/media/press-sound.mp4) · [伸缩与跳舞 GIF 演示](docs/SHOWCASE.md#设置里的小彩蛋)。GIF 无声，视频使用程序内置音效；画面由实际组件渲染，额度为演示数字。
 
@@ -66,8 +72,9 @@
 ## 彩蛋说明
 
 - **坐姿伸缩**：在原位按节奏改变宽高，以可见脚底为支点。默认 3 次，每次 0.8 秒。
-- **跳舞**：保留视频原动作，透明 GIF 本身包含一个 4.55 秒动作周期。默认播放 1 次，按设置重复。
-- 两种彩蛋分别占固定的 2.5% 抽取区间，合计最多 5%。关闭一种不会把概率转给另一种。
+- **跳舞**：替换早期视频抠图版；按用户提供 GIF 的抬手、扭腰、转背和转回顺序重绘。输出 140 帧、7 秒，默认 1 次。由 28 张 AI 关键帧与运动补间构成，不把它宣称为原 GIF 逐帧换装或原画师绘制。
+- **零额度**：仅在当前有效、未过期的额度窗口确实等于 0 时，点击才参与随机触发。保留用户提供的 98 帧、9.8 秒原动图，默认 1 次；设置内可直接预览。
+- 平时伸缩和跳舞各 2.5%；有效额度为 0 时，三种各占 `5% ÷ 3`（约 1.67%），合计最多 5%。每次点击独立抽取，关闭某种不会把概率转给其他种。失败、旧快照、已过重置时间的窗口或四舍五入看起来为 0 的正数，不触发零额度彩蛋。
 - 开关和次数在重启后保留；再次点击人物可以停止播放。设置里的预览按钮可直接查看效果。
 
 ## 来源与创作者署名
@@ -77,10 +84,10 @@
 | 创意与交互参考 | [MeteorNOX / DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget) |
 | 直接源码基础 | [T7moris / GPT-Niang](https://github.com/T7moris/GPT-Niang)，基于 v1.3.5；[上游下载页](https://github.com/T7moris/GPT-Niang/releases) |
 | 原生 Mac 移植 | 上游贡献者 [meaqua9420](https://github.com/meaqua9420) 及 [其他贡献者](docs/UPSTREAM-CREDITS.md) |
-| 跳舞素材 | [这个刀子真甜](https://space.bilibili.com/23315338/)：《[大肥鱼一键跟跳](https://www.bilibili.com/video/BV1ovpE66Es8/)》 |
+| 早期跳舞视频素材 | [这个刀子真甜](https://space.bilibili.com/23315338/)：《[大肥鱼一键跟跳](https://www.bilibili.com/video/BV1ovpE66Es8/)》 |
 | 形象来源 | [ZipZipPipe](https://space.bilibili.com/4168597/)，按用户提供的形象出处署名 |
 
-普通立绘由用户提供；坐姿彩蛋基于角色参考、通过 ImageGen 制作；跳舞 GIF 是从上述视频中提取并处理透明背景。原角色设计和视频动作归对应创作者，本改版记录素材来源与处理方式。
+普通立绘由用户提供；坐姿彩蛋基于角色参考、通过 ImageGen 制作；早期跳舞 GIF 从上述视频中提取并处理透明背景。当前替换版是基于用户另行提供的 140 帧动作参考重绘；零额度原动图也由用户提供，出处与许可待确认。原角色设计和视频动作归对应创作者，本改版记录素材来源与处理方式。
 
 本次需求、使用反馈和发布由 CatGod4456 整理；代码修改与验证使用 Codex 辅助完成。更完整的代码关系、素材加工和许可说明见 [CREDITS](docs/CREDITS.md)。
 
@@ -88,7 +95,7 @@
 
 [关注主播](https://space.bilibili.com/319500223/) 谢谢喵
 
-感谢提供源码、跳舞素材与角色形象的三位 UP 主：
+感谢提供源码、早期跳舞素材与角色形象的三位 UP 主：
 
 | UP 主 | B 站 UID | 本项目引用来源 |
 | --- | --- | --- |
@@ -100,7 +107,7 @@
 
 ## 许可
 
-跳舞片段已获得视频作者对本项目所述用途的同意，见 [素材许可记录](docs/ASSET-PERMISSIONS.md)。
+早期跳舞片段已获得视频作者对本项目所述用途的同意；该许可不自动覆盖本次另行提供的新参考与零额度动图，见 [素材许可记录](docs/ASSET-PERMISSIONS.md)。
 
 代码与一般文档保留上游 [MIT License](LICENSE)，以及 [MeteorNOX 上游语录许可](gpt-niang-usage/assets/quotes-LICENSE.txt) 和 [参考代码许可](references/whale-widget-LICENSE.txt)。
 
@@ -126,7 +133,7 @@ GPT_NIANG_BUILD_CONFIGURATION=release GPT_NIANG_BUILD_UNIVERSAL=1 bash script/bu
 
 ## 验证与数据
 
-本次 Mac 改进通过 146 项原生测试和 17 项构建入口 Node 测试，另通过真实浏览器短按完整压缩／回弹与立即压下检查。测试覆盖额度状态、透明区域命中、菜单栏、主窗口选择、彩蛋概率与播放控制；已在一台 Apple Silicon Mac 安装运行。新增控件的完整鼠标验收，以及多屏／全屏组合场景尚未全部完成。
+本次 Mac 改进通过 150 项原生测试和 17 项构建入口 Node 测试，另通过真实浏览器短按完整压缩／回弹与立即压下检查。测试覆盖额度状态、透明区域命中、菜单栏、主窗口选择、彩蛋概率与播放控制；已在一台 Apple Silicon Mac 安装运行。新增控件的完整鼠标验收，以及多屏／全屏组合场景尚未全部完成。
 
 额度沿用上游的本地只读查询，不发起模型生成。WebView 加载本地资源，不接收账号凭证或聊天正文。仓库与下载包不包含本机登录配置、额度快照、聊天截图或个人设置。
 

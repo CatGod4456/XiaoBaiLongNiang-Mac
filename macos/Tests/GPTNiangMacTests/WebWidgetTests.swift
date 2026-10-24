@@ -52,7 +52,7 @@ final class WebWidgetTests: XCTestCase {
         }
         XCTAssertTrue(loaded, "Bundled HTML, script and CSP must work with the custom URL scheme.")
     }
-    @MainActor func testDanceGifLoadsThroughTheLocalSchemeAndRestoresTheMainCharacter() async throws {
+    @MainActor func testAnimatedEggsLoadThroughTheLocalSchemeAndRestoreTheMainCharacter() async throws {
         _ = NSApplication.shared
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
@@ -63,16 +63,18 @@ final class WebWidgetTests: XCTestCase {
             if model.webViewReady { break }
             try await Task.sleep(nanoseconds: 50_000_000)
         }
-        XCTAssertTrue(model.playEasterEgg(.dance))
-        coordinator.update()
-        var width = 0
-        for _ in 0..<100 {
-            let result = try? await view.browser.evaluateJavaScript("document.getElementById('egg-portrait').naturalWidth")
-            width = (result as? NSNumber)?.intValue ?? 0
-            if width == 400 { break }
-            try await Task.sleep(nanoseconds: 50_000_000)
+        for (egg, expected) in [(EasterEgg.dance, 480), (.zero, 500)] {
+            XCTAssertTrue(model.playEasterEgg(egg))
+            coordinator.update()
+            var width = 0
+            for _ in 0..<100 {
+                let result = try? await view.browser.evaluateJavaScript("document.getElementById('egg-portrait').naturalWidth")
+                width = (result as? NSNumber)?.intValue ?? 0
+                if width == expected { break }
+                try await Task.sleep(nanoseconds: 50_000_000)
+            }
+            XCTAssertEqual(width, expected, "The local transparent GIF must decode in WebKit.")
         }
-        XCTAssertEqual(width, 400, "The local transparent GIF must decode in WebKit.")
         model.finishEasterEgg(); coordinator.update()
         try await Task.sleep(nanoseconds: 100_000_000)
         let active = try await view.browser.evaluateJavaScript("document.getElementById('stage').classList.contains('is-easter-egg')")
@@ -116,6 +118,7 @@ final class WebWidgetTests: XCTestCase {
         let handler = WidgetAssetHandler(root: root, normal: root.appendingPathComponent("normal.png"), low: root.appendingPathComponent("low.png"))
         XCTAssertEqual(handler.resource(URL(string: "gpt-niang://widget/widget.js")!)?.0.lastPathComponent, "widget.js")
         XCTAssertNotNil(handler.resource(URL(string: "gpt-niang://widget/low.png?revision=12")!))
+        XCTAssertEqual(handler.resource(URL(string: "gpt-niang://widget/egg-zero.gif?revision=12")!)?.0.lastPathComponent, "egg-zero.gif")
         for url in ["file:///etc/passwd", "gpt-niang://evil/widget.js", "gpt-niang://widget/secret.txt",
                     "gpt-niang://user@widget/index.html", "gpt-niang://widget/low.png?path=/etc/passwd"] {
             XCTAssertNil(handler.resource(URL(string: url)!))

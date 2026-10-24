@@ -35,18 +35,24 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Toggle("开启随机彩蛋", isOn: $model.easterEggsEnabled)
                     HStack {
-                        Toggle("节奏伸缩 · 2.5%", isOn: $model.squishEnabled)
+                        Toggle("节奏伸缩", isOn: $model.squishEnabled)
                         loopPicker($model.squishLoops)
                         Button("预览") { model.playEasterEgg(.squish) }
                             .disabled(!model.squishEnabled)
                     }.disabled(!model.easterEggsEnabled)
                     HStack {
-                        Toggle("小龙娘跳舞 · 2.5%", isOn: $model.danceEnabled)
+                        Toggle("小龙娘跳舞", isOn: $model.danceEnabled)
                         loopPicker($model.danceLoops)
                         Button("预览") { model.playEasterEgg(.dance) }
                             .disabled(!model.danceEnabled || !FileManager.default.fileExists(atPath: model.easterEggURL(.dance).path))
                     }.disabled(!model.easterEggsEnabled)
-                    Text("各 2.5%，合计最多 5%；每次独立抽取，不累积。关闭一种不会增加另一种的概率。循环播放时，再次点击人物即可结束。")
+                    HStack {
+                        Toggle("零额度彩蛋", isOn: $model.zeroEnabled)
+                        loopPicker($model.zeroLoops)
+                        Button("预览") { model.playEasterEgg(.zero) }
+                            .disabled(!model.zeroEnabled || !FileManager.default.fileExists(atPath: model.easterEggURL(.zero).path))
+                    }.disabled(!model.easterEggsEnabled)
+                    Text("平时前两种各 2.5%；有效额度为 0 时，三种各约 1.67%，合计最多 5%。每次独立抽取、不累积，关闭一种不转移概率。零额度彩蛋的预览不受额度限制；再次点击人物可停止。")
                         .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 }.padding(10)
             }
@@ -85,8 +91,10 @@ struct SettingsView: View {
         .onChange(of: model.easterEggsEnabled) { _ in model.saveEasterEggPreferences() }
         .onChange(of: model.squishEnabled) { _ in model.saveEasterEggPreferences() }
         .onChange(of: model.danceEnabled) { _ in model.saveEasterEggPreferences() }
+        .onChange(of: model.zeroEnabled) { _ in model.saveEasterEggPreferences() }
         .onChange(of: model.squishLoops) { _ in model.saveEasterEggPreferences() }
         .onChange(of: model.danceLoops) { _ in model.saveEasterEggPreferences() }
+        .onChange(of: model.zeroLoops) { _ in model.saveEasterEggPreferences() }
     }
 
     private func loopPicker(_ count: Binding<Int>) -> some View {

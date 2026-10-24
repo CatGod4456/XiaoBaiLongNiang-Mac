@@ -61,8 +61,10 @@ final class WidgetModel: ObservableObject {
     @Published var easterEggsEnabled: Bool
     @Published var squishEnabled: Bool
     @Published var danceEnabled: Bool
+    @Published var zeroEnabled: Bool
     @Published var squishLoops: Int
     @Published var danceLoops: Int
+    @Published var zeroLoops: Int
     private var easterEggWork: DispatchWorkItem?
     let characterImages: CharacterImageStore
     var surfaceVisible = true
@@ -166,8 +168,10 @@ final class WidgetModel: ObservableObject {
         easterEggsEnabled = values["easterEggsEnabled"] as? Bool ?? true
         squishEnabled = values["squishEnabled"] as? Bool ?? true
         danceEnabled = values["danceEnabled"] as? Bool ?? true
+        zeroEnabled = values["zeroEnabled"] as? Bool ?? true
         squishLoops = min(10, max(0, values["squishLoops"] as? Int ?? 3))
         danceLoops = min(10, max(0, values["danceLoops"] as? Int ?? 1))
+        zeroLoops = min(10, max(0, values["zeroLoops"] as? Int ?? 1))
         lowQuotaEnabled = values["lowQuotaEnabled"] as? Bool ?? true
         let lowQuote = values["lowQuotaQuote"] as? String ?? "需要重置……"
         lowQuotaQuote = Quote(text: lowQuote).valid ? lowQuote : "需要重置……"
@@ -473,8 +477,10 @@ final class WidgetModel: ObservableObject {
         values["easterEggsEnabled"] = easterEggsEnabled
         values["squishEnabled"] = squishEnabled
         values["danceEnabled"] = danceEnabled
+        values["zeroEnabled"] = zeroEnabled
         values["squishLoops"] = squishLoops
         values["danceLoops"] = danceLoops
+        values["zeroLoops"] = zeroLoops
         values["pressAnimationSpeed"] = min(3, max(0.5, pressAnimationSpeed))
         values["pressImmediate"] = pressImmediate
         values.merge(current) { _, new in new }
@@ -501,8 +507,15 @@ final class WidgetModel: ObservableObject {
         WidgetResources.bundle.resourceURL!.appendingPathComponent("WebWidget").appendingPathComponent(egg.filename)
     }
     func easterEggImage(_ egg: EasterEgg) -> NSImage? { NSImage(contentsOf: easterEggURL(egg)) }
-    func loopCount(_ egg: EasterEgg) -> Int { min(10, max(0, egg == .squish ? squishLoops : danceLoops)) }
-    func eggEnabled(_ egg: EasterEgg) -> Bool { easterEggsEnabled && (egg == .squish ? squishEnabled : danceEnabled) }
+    func loopCount(_ egg: EasterEgg) -> Int {
+        let count: Int
+        switch egg { case .squish: count = squishLoops; case .dance: count = danceLoops; case .zero: count = zeroLoops }
+        return min(10, max(0, count))
+    }
+    func eggEnabled(_ egg: EasterEgg) -> Bool {
+        guard easterEggsEnabled else { return false }
+        switch egg { case .squish: return squishEnabled; case .dance: return danceEnabled; case .zero: return zeroEnabled }
+    }
     func saveEasterEggPreferences() { finishEasterEgg(); savePreferences() }
     func finishEasterEgg() {
         easterEggWork?.cancel(); easterEggWork = nil
@@ -515,7 +528,7 @@ final class WidgetModel: ObservableObject {
         let generation = easterEggGeneration
         easterEgg = egg
         let loops = loopCount(egg)
-        if egg == .dance { scheduleDanceCycle(remaining: loops); return true }
+        if egg != .squish { scheduleGIFCycle(egg, remaining: loops); return true }
         if loops == 0 { return true }
         let work = DispatchWorkItem { [weak self] in
             Task { @MainActor in
@@ -527,26 +540,28 @@ final class WidgetModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + egg.duration * Double(loops) + 0.06, execute: work)
         return true
     }
-    private func scheduleDanceCycle(remaining: Int) {
+    private func scheduleGIFCycle(_ egg: EasterEgg, remaining: Int) {
         let generation = easterEggGeneration
         let work = DispatchWorkItem { [weak self] in
             Task { @MainActor in
-                guard let self, self.easterEgg == .dance, self.easterEggGeneration == generation else { return }
+                guard let self, self.easterEgg == egg, self.easterEggGeneration == generation else { return }
                 if remaining == 1 { self.finishEasterEgg(); return }
                 // The GIF contains one cycle. Reload it only when another
                 // user-selected cycle is due, including continuous playback.
                 self.easterEggGeneration += 1
-                self.scheduleDanceCycle(remaining: max(0, remaining - 1))
+                self.scheduleGIFCycle(egg, remaining: max(0, remaining - 1))
             }
         }
         easterEggWork = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + EasterEgg.dance.duration + 0.05, execute: work)
+        DispatchQueue.main.asyncAfter(deadline: .now() + egg.duration + 0.05, execute: work)
     }
     func characterClick(draw: Double = Double.random(in: 0..<1)) {
         if easterEgg != nil { finishEasterEgg(); showQuota(); return }
         let danceAvailable = FileManager.default.fileExists(atPath: easterEggURL(.dance).path)
+        let zeroAvailable = FileManager.default.fileExists(atPath: easterEggURL(.zero).path)
         if easterEggsEnabled,
-           let egg = EasterEgg.select(draw: draw, danceAvailable: danceAvailable, squishEnabled: squishEnabled, danceEnabled: danceEnabled),
+           let egg = EasterEgg.select(draw: draw, danceAvailable: danceAvailable, squishEnabled: squishEnabled, danceEnabled: danceEnabled,
+                                     zeroQuota: EasterEgg.zeroEligible(snapshot), zeroAvailable: zeroAvailable, zeroEnabled: zeroEnabled),
            playEasterEgg(egg) { return }
         if bubble && bubbleTapAdvance { clickBubble() } else { showQuota() }
     }
