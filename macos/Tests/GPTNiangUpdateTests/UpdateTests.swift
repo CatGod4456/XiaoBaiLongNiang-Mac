@@ -16,7 +16,7 @@ final class UpdateTests: XCTestCase {
         try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0).write(to: path.appendingPathComponent("Contents/Info.plist"))
     }
     private func fixture() throws -> (UpdateStore, UpdateJournal) {
-        let current = root.appendingPathComponent("GPTNiangMac.app")
+        let current = root.appendingPathComponent("XiaoBaiLongNiangMac.app")
         try app(current, version: "1.3.2")
         let store = try UpdateStore(app: current, data: root.appendingPathComponent("state"))
         let token = UUID().uuidString
@@ -164,10 +164,10 @@ final class UpdateTests: XCTestCase {
         return result
     }
     func testArchiveRejectsTraversalLinksDuplicatesAndTruncation() throws {
-        XCTAssertNoThrow(try NativeArchive.inspect(zip(["GPTNiangMac.app/Contents/Info.plist"])))
-        XCTAssertThrowsError(try NativeArchive.inspect(zip(["GPTNiangMac.app/../user.txt"])))
-        XCTAssertThrowsError(try NativeArchive.inspect(zip(["GPTNiangMac.app/link"], mode: 0xa000)))
-        XCTAssertThrowsError(try NativeArchive.inspect(zip(["GPTNiangMac.app/A", "GPTNiangMac.app/a"])))
-        XCTAssertThrowsError(try NativeArchive.inspect(zip(["GPTNiangMac.app/A"]).dropLast()))
+        XCTAssertNoThrow(try NativeArchive.inspect(zip(["XiaoBaiLongNiangMac.app/Contents/Info.plist"])))
+        XCTAssertThrowsError(try NativeArchive.inspect(zip(["XiaoBaiLongNiangMac.app/../user.txt"])))
+        XCTAssertThrowsError(try NativeArchive.inspect(zip(["XiaoBaiLongNiangMac.app/link"], mode: 0xa000)))
+        XCTAssertThrowsError(try NativeArchive.inspect(zip(["XiaoBaiLongNiangMac.app/A", "XiaoBaiLongNiangMac.app/a"])))
+        XCTAssertThrowsError(try NativeArchive.inspect(zip(["XiaoBaiLongNiangMac.app/A"]).dropLast()))
     }
 }

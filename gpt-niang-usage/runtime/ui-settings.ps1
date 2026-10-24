@@ -2,7 +2,7 @@
   if($script:quoteEditor -and $script:quoteEditor.IsVisible){$script:quoteEditor.Activate()|Out-Null;return}
   $editor=[Windows.Markup.XamlReader]::Parse(@'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- Title="GPT 娘 · 我的语录" Width="540" Height="480" MinWidth="440" MinHeight="340" ShowInTaskbar="False"
+ Title="小白龙娘 · 我的语录" Width="540" Height="480" MinWidth="440" MinHeight="340" ShowInTaskbar="False"
  FontFamily="Microsoft YaHei UI" FontSize="14" Background="#FAF8FD" WindowStartupLocation="CenterScreen">
  <Grid Margin="22">
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -224,7 +224,7 @@ function Initialize-WidgetSettingsMenu {
     $script:settingsMenuUi.UpdateStatus=Add-SettingsPanel $status -Passive -ReturnItem
   } -ReturnItem
   Add-SettingsDivider
-  $exit=Add-SettingsAction '退出 GPT 娘' {Exit-WidgetForSession} -ReturnItem;$exit.Foreground=[Windows.Media.BrushConverter]::new().ConvertFromString('#A1788D')
+  $exit=Add-SettingsAction '退出 小白龙娘' {Exit-WidgetForSession} -ReturnItem;$exit.Foreground=[Windows.Media.BrushConverter]::new().ConvertFromString('#A1788D')
   $script:context.Add_Opened({Pause-CompletionNotification;Reset-WidgetAutoQuoteSchedule;Update-WidgetSettingsMenu;Set-WidgetMenuBounds;Position-WidgetMenuToHost})
   $script:context.Add_Closed({Reset-WidgetAutoQuoteSchedule;Set-WidgetSizePreview $false})
   Initialize-SettingsMenuDismiss

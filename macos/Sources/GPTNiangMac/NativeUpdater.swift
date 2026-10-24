@@ -91,7 +91,7 @@ final class NativeUpdater: ObservableObject {
         guard !busy else { return }
         guard !sourceCheckout() else { setStatus("自定义 WebView 版本请从源码构建更新。"); return }
         guard !app.path.contains("/AppTranslocation/"), FileManager.default.isWritableFile(atPath: app.deletingLastPathComponent().path) else {
-            setStatus("請先將 GPT 娘移到可寫入的應用程式目錄。"); return
+            setStatus("請先將 小白龙娘移到可寫入的應用程式目錄。"); return
         }
         if !manual && (!automatic || Date().timeIntervalSince1970 < schedule.nextCheck) { return }
         schedule.nextCheck = Date().timeIntervalSince1970 + UpdatePolicy.day
@@ -156,8 +156,8 @@ final class NativeUpdater: ObservableObject {
         }
     }
     private static func launchHelper(store: UpdateStore, recover: Bool) throws {
-        let source = store.app.appendingPathComponent("Contents/Helpers/GPTNiangUpdater")
-        let helper = store.data.appendingPathComponent("GPTNiangUpdater")
+        let source = store.app.appendingPathComponent("Contents/Helpers/XiaoBaiLongNiangUpdater")
+        let helper = store.data.appendingPathComponent("XiaoBaiLongNiangUpdater")
         try UpdateFiles.checkPath(helper)
         try Data(contentsOf: source).write(to: helper, options: .atomic)
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: helper.path)

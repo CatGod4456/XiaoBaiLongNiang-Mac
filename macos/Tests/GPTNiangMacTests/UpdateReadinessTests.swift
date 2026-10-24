@@ -23,7 +23,7 @@ final class UpdateReadinessTests: XCTestCase {
         }
     }
     private func store(_ root: URL, phase: UpdatePhase = .replaced) throws -> UpdateStore {
-        let store = try UpdateStore(app: root.appendingPathComponent("GPTNiangMac.app"), data: root.appendingPathComponent("state"))
+        let store = try UpdateStore(app: root.appendingPathComponent("XiaoBaiLongNiangMac.app"), data: root.appendingPathComponent("state"))
         var journal = UpdateJournal(token: UUID().uuidString, app: store.app, data: store.data,
             version: "1.3.4", oldVersion: "1.3.3", hash: "fixture", parentPID: getpid())
         journal.phase = phase; try store.save(journal)
@@ -120,7 +120,7 @@ final class UpdateReadinessTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: active.data.appendingPathComponent("mac-update-health.json").path))
     }
     @MainActor func testNoPendingOrCompletedTransactionNeedsNoWorkerReadsOrHealthWrite() throws {
-        let root = try fixture(), data = root.appendingPathComponent("state"), app = root.appendingPathComponent("GPTNiangMac.app")
+        let root = try fixture(), data = root.appendingPathComponent("state"), app = root.appendingPathComponent("XiaoBaiLongNiangMac.app")
         func unexpectedReadiness() -> Bool { XCTFail("No pending transaction"); return false }
         XCTAssertTrue(NativeUpdater.confirmLaunch(data: data, app: app, version: "1.3.4", workerReady: unexpectedReadiness))
         _ = try store(root, phase: .committed)

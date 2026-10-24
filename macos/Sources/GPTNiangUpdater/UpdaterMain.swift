@@ -26,7 +26,7 @@ enum UpdaterMain {
             NSWorkspace.shared.openApplication(at: app, configuration: configuration) { running, error in
                 if let error { continuation.resume(throwing: error) }
                 else if let running { continuation.resume(returning: running.processIdentifier) }
-                else { continuation.resume(throwing: UpdateFailure("無法重新開啟 GPT 娘。")) }
+                else { continuation.resume(throwing: UpdateFailure("無法重新開啟 小白龙娘。")) }
             }
         }
     }

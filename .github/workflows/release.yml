@@ -62,18 +62,18 @@ jobs:
         run: |
           set -euo pipefail
           version="$(node -p "require('./gpt-niang-usage/package.json').version")"
-          lipo dist/GPTNiangMac.app/Contents/MacOS/GPTNiangMac -verify_arch arm64 x86_64
-          lipo dist/GPTNiangMac.app/Contents/Helpers/GPTNiangUpdater -verify_arch arm64 x86_64
-          dist/GPTNiangMac.app/Contents/Helpers/GPTNiangUpdater --validate-bundle dist/GPTNiangMac.app "$version" --universal
-          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' dist/GPTNiangMac.app/Contents/Info.plist)" = "$version"
-          codesign --verify --deep --strict dist/GPTNiangMac.app
+          lipo dist/XiaoBaiLongNiangMac.app/Contents/MacOS/XiaoBaiLongNiangMac -verify_arch arm64 x86_64
+          lipo dist/XiaoBaiLongNiangMac.app/Contents/Helpers/XiaoBaiLongNiangUpdater -verify_arch arm64 x86_64
+          dist/XiaoBaiLongNiangMac.app/Contents/Helpers/XiaoBaiLongNiangUpdater --validate-bundle dist/XiaoBaiLongNiangMac.app "$version" --universal
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' dist/XiaoBaiLongNiangMac.app/Contents/Info.plist)" = "$version"
+          codesign --verify --deep --strict dist/XiaoBaiLongNiangMac.app
           archive="dist/gpt-niang-usage-widget-v$version-macos-universal.zip"
-          ditto -c -k --sequesterRsrc --keepParent dist/GPTNiangMac.app "$archive"
+          ditto -c -k --sequesterRsrc --keepParent dist/XiaoBaiLongNiangMac.app "$archive"
           mkdir -p "$RUNNER_TEMP/mac-release-check"
           ditto -x -k "$archive" "$RUNNER_TEMP/mac-release-check"
-          codesign --verify --deep --strict "$RUNNER_TEMP/mac-release-check/GPTNiangMac.app"
-          lipo "$RUNNER_TEMP/mac-release-check/GPTNiangMac.app/Contents/MacOS/GPTNiangMac" -verify_arch arm64 x86_64
-          "$RUNNER_TEMP/mac-release-check/GPTNiangMac.app/Contents/Helpers/GPTNiangUpdater" --validate-bundle "$RUNNER_TEMP/mac-release-check/GPTNiangMac.app" "$version" --universal
+          codesign --verify --deep --strict "$RUNNER_TEMP/mac-release-check/XiaoBaiLongNiangMac.app"
+          lipo "$RUNNER_TEMP/mac-release-check/XiaoBaiLongNiangMac.app/Contents/MacOS/XiaoBaiLongNiangMac" -verify_arch arm64 x86_64
+          "$RUNNER_TEMP/mac-release-check/XiaoBaiLongNiangMac.app/Contents/Helpers/XiaoBaiLongNiangUpdater" --validate-bundle "$RUNNER_TEMP/mac-release-check/XiaoBaiLongNiangMac.app" "$version" --universal
       - uses: actions/upload-artifact@v4
         with:
           name: release-macos

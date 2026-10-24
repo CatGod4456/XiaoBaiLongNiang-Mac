@@ -106,7 +106,7 @@ function Open-WidgetCharacterGallery {
   if($script:characterGallery -and $script:characterGallery.IsVisible){$script:characterGallery.Activate()|Out-Null;return}
   $gallery=[Windows.Markup.XamlReader]::Parse(@'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- Title="GPT 娘 · 选择你喜欢的形象" Width="610" Height="560" WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True"
+ Title="小白龙娘 · 选择你喜欢的形象" Width="610" Height="560" WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True"
  ShowInTaskbar="False" FontFamily="Microsoft YaHei UI" FontSize="14" Background="Transparent" WindowStartupLocation="CenterOwner">
  <Window.Resources>
   <Style x:Key="CharacterCard" TargetType="Button">

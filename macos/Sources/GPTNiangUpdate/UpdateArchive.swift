@@ -44,8 +44,8 @@ public enum NativeArchive {
             let pieces = name.hasSuffix("/") ? Array(components.dropLast()) : components
             guard !name.hasPrefix("/"), !name.contains("\\"), !name.contains("\0"), !name.contains(":"),
                   pieces.allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." && $0 != ".git" }),
-                  name == "GPTNiangMac.app/" || name.hasPrefix("GPTNiangMac.app/") || name == "__MACOSX/" ||
-                    name.hasPrefix("__MACOSX/GPTNiangMac.app/") || name == "__MACOSX/._GPTNiangMac.app" else { throw UpdateFailure("ZIP 路徑超出應用包範圍。") }
+                  name == "XiaoBaiLongNiangMac.app/" || name.hasPrefix("XiaoBaiLongNiangMac.app/") || name == "__MACOSX/" ||
+                    name.hasPrefix("__MACOSX/XiaoBaiLongNiangMac.app/") || name == "__MACOSX/._XiaoBaiLongNiangMac.app" else { throw UpdateFailure("ZIP 路徑超出應用包範圍。") }
             let mode = try uint(cursor + 38, 4) >> 16, type = mode & 0xf000
             guard type == 0 || type == 0x8000 || type == 0x4000 else { throw UpdateFailure("更新包不能包含目錄連結。") }
             guard names.insert(name.precomposedStringWithCanonicalMapping.lowercased()).inserted else { throw UpdateFailure("更新包包含重複路徑。") }
@@ -66,7 +66,7 @@ public enum NativeArchive {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
         try NativeTools.run("/usr/bin/ditto", ["-x", "-k", archive.path, directory.path])
         try UpdateFiles.checkTree(directory)
-        return directory.appendingPathComponent("GPTNiangMac.app", isDirectory: true)
+        return directory.appendingPathComponent("XiaoBaiLongNiangMac.app", isDirectory: true)
     }
     public static func version(of app: URL) throws -> String {
         let data = try Data(contentsOf: app.appendingPathComponent("Contents/Info.plist"))
@@ -78,7 +78,7 @@ public enum NativeArchive {
     public static func validate(_ app: URL, version: String, universal: Bool = true) throws {
         try UpdateFiles.checkTree(app)
         guard try self.version(of: app) == version else { throw UpdateFailure("應用版本與正式版標籤不符。") }
-        for file in ["Contents/MacOS/GPTNiangMac", "Contents/Helpers/GPTNiangUpdater", "Contents/Resources/Backend/runtime/watch.mjs", "Contents/Resources/quotes.json"] {
+        for file in ["Contents/MacOS/XiaoBaiLongNiangMac", "Contents/Helpers/XiaoBaiLongNiangUpdater", "Contents/Resources/Backend/runtime/watch.mjs", "Contents/Resources/quotes.json"] {
             guard FileManager.default.fileExists(atPath: app.appendingPathComponent(file).path) else { throw UpdateFailure("應用包缺少必要檔案。") }
         }
         if let target = StableVersion(version), let localized = StableVersion("1.3.4"), target >= localized {
@@ -93,7 +93,7 @@ public enum NativeArchive {
         }
         try NativeTools.run("/usr/bin/codesign", ["--verify", "--deep", "--strict", app.path])
         if universal {
-            for file in ["Contents/MacOS/GPTNiangMac", "Contents/Helpers/GPTNiangUpdater"] {
+            for file in ["Contents/MacOS/XiaoBaiLongNiangMac", "Contents/Helpers/XiaoBaiLongNiangUpdater"] {
                 try NativeTools.run("/usr/bin/lipo", [app.appendingPathComponent(file).path, "-verify_arch", "arm64", "x86_64"])
             }
         }

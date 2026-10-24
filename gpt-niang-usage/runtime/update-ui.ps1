@@ -9,7 +9,7 @@ function Test-WidgetUpdateEditor {
 function Start-WidgetUpdate([string]$Mode='manual') {
   if($script:updateProcess){if(!$script:updateProcess.HasExited){return};$script:updateProcess.Dispose();$script:updateProcess=$null}
   if($Mode-eq 'manual' -and (Test-WidgetUpdateEditor)){
-    [Windows.MessageBox]::Show($script:window,'请先保存并关闭编辑窗口，再检查更新。','GPT 娘更新')|Out-Null;return
+    [Windows.MessageBox]::Show($script:window,'请先保存并关闭编辑窗口，再检查更新。','小白龙娘更新')|Out-Null;return
   }
   if(!$script:config.nodePath){return}
   $info=New-Object Diagnostics.ProcessStartInfo

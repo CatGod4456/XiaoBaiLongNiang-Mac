@@ -368,7 +368,7 @@ function Select-WidgetAudioFile {
     return $null
 }
 function Show-WidgetAudioError([string]$Message) {
-    [Windows.MessageBox]::Show($script:window,$Message,'GPT 娘 · 音效',[Windows.MessageBoxButton]::OK,[Windows.MessageBoxImage]::Warning)|Out-Null
+    [Windows.MessageBox]::Show($script:window,$Message,'小白龙娘 · 音效',[Windows.MessageBoxButton]::OK,[Windows.MessageBoxImage]::Warning)|Out-Null
 }
 function Invoke-WidgetAudioAction([string]$Action,[string]$Slot) {
     $script:audioDialogOpen=$true

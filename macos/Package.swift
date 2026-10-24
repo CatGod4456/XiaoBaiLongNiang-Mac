@@ -5,8 +5,8 @@ let package = Package(
     name: "GPTNiangMac",
     defaultLocalization: "zh-Hans",
     platforms: [.macOS(.v13)],
-    products: [.executable(name: "GPTNiangMac", targets: ["GPTNiangMac"]),
-               .executable(name: "GPTNiangUpdater", targets: ["GPTNiangUpdater"])],
+    products: [.executable(name: "XiaoBaiLongNiangMac", targets: ["GPTNiangMac"]),
+               .executable(name: "XiaoBaiLongNiangUpdater", targets: ["GPTNiangUpdater"])],
     targets: [
         .target(name: "GPTNiangCore", resources: [.process("Resources")]),
         .target(name: "GPTNiangUpdate"),

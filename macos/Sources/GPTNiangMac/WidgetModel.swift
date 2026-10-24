@@ -130,7 +130,7 @@ final class WidgetModel: ObservableObject {
     private var refreshUntil = Date.distantPast
     private var lastStatusData: Data?
     private var lastChecked: Double?
-    private let logger = Logger(subsystem: "io.github.t7moris.GPTNiangMac", category: "worker")
+    private let logger = Logger(subsystem: "io.github.catgod4456.XiaoBaiLongNiangMac", category: "worker")
 
     init(dataDirectory: URL, resources: URL) {
         self.dataDirectory = dataDirectory; self.resources = resources
@@ -409,7 +409,7 @@ final class WidgetModel: ObservableObject {
         workerRecoveryPending = false
         try? stderr?.close(); stderr = nil
         guard let node = findNode() else {
-            snapshot = UsageSnapshot(error: text("找不到 Node.js 20+。請先安裝 Node.js，再重新開啟 GPT 娘。"))
+            snapshot = UsageSnapshot(error: text("找不到 Node.js 20+。請先安裝 Node.js，再重新開啟 小白龙娘。"))
             return
         }
         let backend = resources.appendingPathComponent("Backend")

@@ -14,7 +14,7 @@ if(command==='query'){
   atomicJson(path.join(config.dataDir,'display-request.json'),{mode:command==='show'?'quota':command,at:Date.now(),nonce:crypto.randomUUID()});
   console.log('已请求显示'+(command==='show'?'额度':command==='quote'?'语录':command==='characters'?'形象图库':'设置'));
 }else if(command==='stop'){
-  fs.writeFileSync(path.join(config.dataDir,'stop.flag'),'stop');console.log('已请求退出 GPT 娘');
+  fs.writeFileSync(path.join(config.dataDir,'stop.flag'),'stop');console.log('已请求退出 小白龙娘');
 }else if(command==='status'){
   let runtime=null,quota=null,presence=null;
   try{runtime=JSON.parse(fs.readFileSync(path.join(config.dataDir,'runtime.json'),'utf8').replace(/^\uFEFF/,''));}catch{}

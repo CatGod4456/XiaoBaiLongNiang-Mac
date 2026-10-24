@@ -52,7 +52,7 @@ function Set-WidgetMusicEnabled([bool]$Enabled) {
     if($script:settingsMenuUi.MusicEnabled){$script:settingsMenuUi.MusicEnabled.IsChecked=$true}
   }catch{
     $script:musicLastError=$_.Exception.Message;Stop-WidgetMusic
-    [Windows.MessageBox]::Show(('音乐律动暂时无法启动：'+$script:musicLastError),'GPT 娘')|Out-Null
+    [Windows.MessageBox]::Show(('音乐律动暂时无法启动：'+$script:musicLastError),'小白龙娘')|Out-Null
   }
 }
 function Update-WidgetMusicPlacement($Frame,[double]$Dpi,[double]$X,[double]$Y,[bool]$Visible) {

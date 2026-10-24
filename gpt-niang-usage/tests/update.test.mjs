@@ -27,10 +27,10 @@ export function zipFixture(files,{mode=0x8000,compressed=false,expandedOverride}
   return Buffer.concat([...local,directory,end]);
 }
 function packageFiles(version='1.3.3') {
-  const files=Object.fromEntries(required.map(name=>['GPT娘额度挂件/gpt-niang-usage/'+name,'fixture']));
-  for(const name of ['package.json','.codex-plugin/plugin.json'])files['GPT娘额度挂件/gpt-niang-usage/'+name]=JSON.stringify({version});
-  files['GPT娘额度挂件/gpt-niang-usage/runtime/install-files.json']=JSON.stringify(required);
-  files['GPT娘额度挂件/.agents/plugins/marketplace.json']='{}';return files;
+  const files=Object.fromEntries(required.map(name=>['小白龙娘额度挂件/gpt-niang-usage/'+name,'fixture']));
+  for(const name of ['package.json','.codex-plugin/plugin.json'])files['小白龙娘额度挂件/gpt-niang-usage/'+name]=JSON.stringify({version});
+  files['小白龙娘额度挂件/gpt-niang-usage/runtime/install-files.json']=JSON.stringify(required);
+  files['小白龙娘额度挂件/.agents/plugins/marketplace.json']='{}';return files;
 }
 function release(bytes,version='1.3.3') {
   const name=`gpt-niang-usage-widget-v${version}-windows.zip`,base=`https://github.com/T7moris/GPT-Niang/releases/download/v${version}/`;
@@ -84,7 +84,7 @@ test('ZIP entry limits, decompression limits, CRC and local path checks precede 
 });
 test('version and required-file validation rejects incomplete packages',()=>{
   assert.throws(()=>validatePackage(inspectZip(zipFixture(packageFiles('9.0.0'))),'1.3.3'));
-  const files=packageFiles();delete files['GPT娘额度挂件/gpt-niang-usage/runtime/watch.mjs'];assert.throws(()=>validatePackage(inspectZip(zipFixture(files)),'1.3.3'));
+  const files=packageFiles();delete files['小白龙娘额度挂件/gpt-niang-usage/runtime/watch.mjs'];assert.throws(()=>validatePackage(inspectZip(zipFixture(files)),'1.3.3'));
 });
 test('candidate files are compared to the validated archive again before replacement',t=>{
   const dir=temporary(t),bytes=zipFixture(packageFiles()),archive=path.join(dir,'release.zip');fs.writeFileSync(archive,bytes);
@@ -168,7 +168,7 @@ test('idle installation rejects drag, menus, editors, busy workers and expired s
 });
 test('invalid hash, malicious ZIP, wrong version, missing files and interrupted downloads never launch installation',async t=>{
   for(const kind of ['hash','zip','version','missing','interrupt','rate-limit']) {
-    const files=packageFiles(kind==='version'?'9.0.0':'1.3.3');if(kind==='missing')delete files['GPT娘额度挂件/gpt-niang-usage/widget.xaml'];
+    const files=packageFiles(kind==='version'?'9.0.0':'1.3.3');if(kind==='missing')delete files['小白龙娘额度挂件/gpt-niang-usage/widget.xaml'];
     const bytes=zipFixture(kind==='zip'?{'root/../evil':'evil'}:files),{config,options,sums}=setup(t,bytes),fetch=options.fetchBytes;
     options.fetchBytes=async (url,args)=>{
       if(kind==='interrupt')throw new Error('Download interrupted');

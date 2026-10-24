@@ -4,7 +4,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$ROOT_DIR/script/macos-toolchain.sh"
 gpt_niang_prepare_toolchain "$ROOT_DIR"
 MODE="${1:-run}"
-APP_NAME="GPTNiangMac"
+APP_NAME="XiaoBaiLongNiangMac"
 APP_BUNDLE="$ROOT_DIR/dist/$APP_NAME.app"
 case "$MODE" in run|--verify|--debug|--logs|--telemetry|--build-only) ;; *) echo "Usage: $0 [--build-only|--verify|--debug|--logs|--telemetry]" >&2; exit 2 ;; esac
 if [ "$MODE" != --build-only ]; then pkill -x "$APP_NAME" >/dev/null 2>&1 || true; fi
@@ -30,7 +30,7 @@ cp -R "$BIN_DIR/GPTNiangMac_GPTNiangCore.bundle" "$APP_BUNDLE/Contents/Resources
 cp -R "$BIN_DIR/GPTNiangMac_GPTNiangMac.bundle" "$APP_BUNDLE/Contents/Resources/"
 cp "$ROOT_DIR/gpt-niang-usage/assets/gpt-dragon-niang-low-quota.png" "$APP_BUNDLE/Contents/Resources/"
 cp "$ROOT_DIR/gpt-niang-usage/assets/low-quota-SOURCE.txt" "$APP_BUNDLE/Contents/Resources/"
-cp "$BIN_DIR/GPTNiangUpdater" "$APP_BUNDLE/Contents/Helpers/GPTNiangUpdater"
+cp "$BIN_DIR/XiaoBaiLongNiangUpdater" "$APP_BUNDLE/Contents/Helpers/XiaoBaiLongNiangUpdater"
 for runtime in "$ROOT_DIR/gpt-niang-usage/runtime/"*.mjs; do
   if [ "$(basename "$runtime")" != update.mjs ]; then cp "$runtime" "$APP_BUNDLE/Contents/Resources/Backend/runtime/"; fi
 done
@@ -52,10 +52,10 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-<key>CFBundleExecutable</key><string>GPTNiangMac</string>
-<key>CFBundleIdentifier</key><string>io.github.t7moris.GPTNiangMac</string>
-<key>CFBundleName</key><string>GPT 娘</string>
-<key>CFBundleDisplayName</key><string>GPT 娘</string>
+<key>CFBundleExecutable</key><string>XiaoBaiLongNiangMac</string>
+<key>CFBundleIdentifier</key><string>io.github.catgod4456.XiaoBaiLongNiangMac</string>
+<key>CFBundleName</key><string>小白龙娘</string>
+<key>CFBundleDisplayName</key><string>小白龙娘</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
@@ -71,8 +71,8 @@ PLIST
 /usr/bin/xattr -rd com.apple.FinderInfo "$APP_BUNDLE" 2>/dev/null || true
 /usr/bin/xattr -rd com.apple.ResourceFork "$APP_BUNDLE" 2>/dev/null || true
 # Remove local debug symbols before signing distributable executables.
-/usr/bin/strip -S -x "$APP_BUNDLE/Contents/MacOS/$APP_NAME" "$APP_BUNDLE/Contents/Helpers/GPTNiangUpdater"
-/usr/bin/codesign --force --sign - "$APP_BUNDLE/Contents/Helpers/GPTNiangUpdater"
+/usr/bin/strip -S -x "$APP_BUNDLE/Contents/MacOS/$APP_NAME" "$APP_BUNDLE/Contents/Helpers/XiaoBaiLongNiangUpdater"
+/usr/bin/codesign --force --sign - "$APP_BUNDLE/Contents/Helpers/XiaoBaiLongNiangUpdater"
 /usr/bin/codesign --force --sign - "$APP_BUNDLE/Contents/Resources/node"
 /usr/bin/codesign --force --deep --sign - "$APP_BUNDLE"
 open_app() { /usr/bin/open -n "$APP_BUNDLE" --args "${@:2}"; }
@@ -80,8 +80,8 @@ open_app() { /usr/bin/open -n "$APP_BUNDLE" --args "${@:2}"; }
 case "$MODE" in
   --build-only) echo "Built $APP_BUNDLE" ;;
   --debug) lldb -- "$APP_BUNDLE/Contents/MacOS/$APP_NAME" ;;
-  --logs) open_app "$@"; /usr/bin/log stream --info --style compact --predicate 'process == "GPTNiangMac"' ;;
-  --telemetry) open_app "$@"; /usr/bin/log stream --info --style compact --predicate 'subsystem == "io.github.t7moris.GPTNiangMac"' ;;
+  --logs) open_app "$@"; /usr/bin/log stream --info --style compact --predicate 'process == "XiaoBaiLongNiangMac"' ;;
+  --telemetry) open_app "$@"; /usr/bin/log stream --info --style compact --predicate 'subsystem == "io.github.catgod4456.XiaoBaiLongNiangMac"' ;;
   --verify) open_app "$@"; sleep 2; pgrep -x "$APP_NAME" >/dev/null; echo "Verified app process" ;;
   run) open_app "$@" ;;
 esac

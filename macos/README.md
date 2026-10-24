@@ -1,12 +1,12 @@
-# GPT-Niang（GPT 娘）macOS
+# GPT-Niang（小白龙娘）macOS
 
 Current release: **1.3.5**. This macOS package was built by CI. Platform differences in 1.3.5: Windows-only music rhythm, character gallery, auto quotes and independent character/bubble scaling; macOS-only chat-speed panel and interface language; WAV click-sound import and completion reminders are on both platforms. Chinese installation and platform comparison: [project README](../README.md#macos-安装).
 
 Code contributions, reviews, bug reproductions and feature suggestions are credited with their PR/Issue links in the [complete contributor acknowledgements](../README.md#致谢与许可).
 
-The widget detects Free, Go, Plus, Pro, Team/Business, Enterprise, Edu and future plan identifiers, and renders valid quota windows returned by Codex, including Go's 30-day window. A single window stays centered inside the original bubble. Plan labels do not determine entitlements or invent quota windows. To inspect the installed app's plan without exposing account identity or credentials, run `node /Applications/GPTNiangMac.app/Contents/Resources/Backend/runtime/detect-plan.mjs --json` after upgrading; from source, run `node gpt-niang-usage/runtime/detect-plan.mjs --json` at the repository root.
+The widget detects Free, Go, Plus, Pro, Team/Business, Enterprise, Edu and future plan identifiers, and renders valid quota windows returned by Codex, including Go's 30-day window. A single window stays centered inside the original bubble. Plan labels do not determine entitlements or invent quota windows. To inspect the installed app's plan without exposing account identity or credentials, run `node /Applications/XiaoBaiLongNiangMac.app/Contents/Resources/Backend/runtime/detect-plan.mjs --json` after upgrading; from source, run `node gpt-niang-usage/runtime/detect-plan.mjs --json` at the repository root.
 
-A native macOS companion for the Windows GPT 娘 widget. The SwiftUI canvas ports
+A native macOS companion for the Windows 小白龙娘 widget. The SwiftUI canvas ports
 v1.2.5's character image, 378-point animation stage, cloud outline, thought bubbles,
 press/rebound Bézier curves, staggered open/close animations, flowing palettes,
 quote transitions, and original sound assets. AppKit owns the transparent panel,
@@ -29,7 +29,7 @@ If a CommandLineTools-only source build reports a missing SwiftUI macro plugin, 
 - Not real-machine verified yet on this macOS build: multi-display, Stage Manager, fullscreen Spaces, audio import, and the update readiness/rollback path. The macOS updater additionally requires a fresh quota-worker heartbeat before committing an update, so validate on a non-critical machine first.
 ## Install the release
 
-Download `gpt-niang-usage-widget-v1.3.5-macos-universal.zip` from the [v1.3.5 GitHub Release](https://github.com/T7moris/GPT-Niang/releases/tag/v1.3.5), verify its entry in `SHA256SUMS.txt`, unzip, and move `GPTNiangMac.app` to Applications before opening. Node.js 20+ and a signed-in Codex desktop app are required; Swift/Xcode is needed only for source builds.
+Download `gpt-niang-usage-widget-v1.3.5-macos-universal.zip` from the [v1.3.5 GitHub Release](https://github.com/T7moris/GPT-Niang/releases/tag/v1.3.5), verify its entry in `SHA256SUMS.txt`, unzip, and move `XiaoBaiLongNiangMac.app` to Applications before opening. Node.js 20+ and a signed-in Codex desktop app are required; Swift/Xcode is needed only for source builds.
 
 The release is ad-hoc signed, not Developer ID signed or notarized. If macOS blocks the first launch, after checking the source and checksum follow [Apple’s instructions](https://support.apple.com/102445) in System Settings → Privacy & Security → Open Anyway.
 
@@ -49,7 +49,7 @@ From the repository root:
 ./script/build_and_run.sh
 ```
 
-The script builds and ad-hoc signs `dist/GPTNiangMac.app`, then opens the app bundle.
+The script builds and ad-hoc signs `dist/XiaoBaiLongNiangMac.app`, then opens the app bundle.
 `--build-only` builds without launching; `--verify` also checks the process.
 `--logs`, `--telemetry`, and `--debug` are available for development.
 Passing `--speed` after a run mode opens the separate speed panel at launch.
@@ -122,9 +122,9 @@ Local preferences/quota snapshots live at:
 
 ## Update, move, and uninstall
 
-For 1.3.3+, use the native update controls described below. For a first upgrade from older versions, quit GPT 娘 and replace the app in its original location; preferences and custom quotes remain in the data directory above. To move the app, disable login launch first, quit, move it, and enable login launch again from the new location if needed.
+For 1.3.3+, use the native update controls described below. For a first upgrade from older versions, quit 小白龙娘 and replace the app in its original location; preferences and custom quotes remain in the data directory above. To move the app, disable login launch first, quit, move it, and enable login launch again from the new location if needed.
 
-Choosing **退出 GPT 娘** quits the Mac application and helpers. Reopening Codex alone does not relaunch GPT 娘; open the `.app` again. Login launch is optional, unlike the Windows installer’s default startup configuration.
+Choosing **退出 小白龙娘** quits the Mac application and helpers. Reopening Codex alone does not relaunch 小白龙娘; open the `.app` again. Login launch is optional, unlike the Windows installer’s default startup configuration.
 
 To uninstall, disable login launch, quit, and remove the app. Remove the data directory separately only if you want to discard preferences and snapshots. Do not delete Codex’s own login or session data.
 
@@ -136,7 +136,7 @@ node --test tests/*.test.mjs
 cd ..
 swift test --package-path macos
 ./script/build_and_run.sh --build-only
-codesign --verify --deep --strict dist/GPTNiangMac.app
+codesign --verify --deep --strict dist/XiaoBaiLongNiangMac.app
 ```
 
 `--diagnostics /absolute/path.json` after the run mode enables a local development

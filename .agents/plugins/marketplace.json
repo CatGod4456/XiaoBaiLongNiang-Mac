@@ -1,6 +1,6 @@
 {
   "name": "gpt-niang-local",
-  "interface": {"displayName": "GPT娘额度挂件"},
+  "interface": {"displayName": "小白龙娘额度挂件"},
   "plugins": [{
     "name": "gpt-niang-usage",
     "source": {"source": "local", "path": "./gpt-niang-usage"},

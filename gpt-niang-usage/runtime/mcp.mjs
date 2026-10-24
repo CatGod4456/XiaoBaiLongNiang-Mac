@@ -29,7 +29,7 @@ async function handle(m){
       default:send({jsonrpc:'2.0',id:m.id,error:{code:-32601,message:'Method not found'}});return;
     }
     send({jsonrpc:'2.0',id:m.id,result});
-  }catch{send({jsonrpc:'2.0',id:m.id,error:{code:-32603,message:'GPT 娘额度服务暂不可用，请检查本地安装'}});}
+  }catch{send({jsonrpc:'2.0',id:m.id,error:{code:-32603,message:'小白龙娘额度服务暂不可用，请检查本地安装'}});}
 }
 readline.createInterface({input:process.stdin}).on('line',line=>{
   if(line.length>1024*1024)return;

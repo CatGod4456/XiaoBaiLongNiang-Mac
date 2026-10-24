@@ -100,7 +100,7 @@ public struct UpdateStore {
     public func journal() throws -> UpdateJournal? { try UpdateFiles.read(UpdateJournal.self, at: journalURL) }
     public func save(_ journal: UpdateJournal) throws { try validate(journal); try UpdateFiles.write(journal, to: journalURL) }
     public func cache(_ token: String) -> URL { data.appendingPathComponent("mac-updates/" + token, isDirectory: true) }
-    public func artifact(_ token: String) -> URL { app.deletingLastPathComponent().appendingPathComponent(".GPTNiangMac-update-" + token, isDirectory: true) }
+    public func artifact(_ token: String) -> URL { app.deletingLastPathComponent().appendingPathComponent(".XiaoBaiLongNiangMac-update-" + token, isDirectory: true) }
     public func staged(_ token: String) -> URL { artifact(token).appendingPathComponent(app.lastPathComponent, isDirectory: true) }
     public func ownership(_ token: String) -> UpdateOwnership { UpdateOwnership(schema: 1, uid: getuid(), token: token, appPath: app.path, dataPath: data.path) }
     public func validate(_ journal: UpdateJournal) throws {

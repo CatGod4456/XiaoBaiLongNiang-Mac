@@ -43,7 +43,7 @@ function Save-WidgetColorTriggers($Lines){
 function Open-ColorTriggerEditor {
   if($script:colorTriggerEditor -and $script:colorTriggerEditor.IsVisible){$script:colorTriggerEditor.Activate()|Out-Null;return}
   $editor=[Windows.Markup.XamlReader]::Parse(@'
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="GPT 娘 · 特殊台词" Width="540" Height="430" MinWidth="440" MinHeight="330" ShowInTaskbar="False" FontFamily="Microsoft YaHei UI" FontSize="14" Background="#FAF8FD" WindowStartupLocation="CenterScreen">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="小白龙娘 · 特殊台词" Width="540" Height="430" MinWidth="440" MinHeight="330" ShowInTaskbar="False" FontFamily="Microsoft YaHei UI" FontSize="14" Background="#FAF8FD" WindowStartupLocation="CenterScreen">
  <Grid Margin="22"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <TextBlock Text="一行一句。仅用于按台词匹配的变色模式；独立随机模式忽略此名单。台词请在我的语录中添加。" TextWrapping="Wrap" Foreground="#745A98" Margin="0,0,0,14"/>
   <TextBox x:Name="Lines" Grid.Row="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" FontSize="16" Padding="12" Background="White" BorderBrush="#DDD4EA"/>

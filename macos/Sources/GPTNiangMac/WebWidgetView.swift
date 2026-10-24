@@ -176,7 +176,7 @@ final class WidgetAssetHandler: NSObject, WKURLSchemeHandler {
             "plan": model.snapshot.planLabel ?? model.text("未知套餐"),
             "error": model.snapshot.error ?? model.text("目前帳戶未提供額度視窗"), "windows": rows,
             "labels": ["refresh": model.text("刷新額度"), "settings": model.text("掛件設定"),
-                "character": model.text("GPT 娘：點擊查看額度，拖動調整位置"),
+                "character": model.text("小白龙娘：點擊查看額度，拖動調整位置"),
                 "stale": model.text("舊快照 · 刷新後確認"), "wait": model.text("等待更新後的額度"),
                 "minutes": model.text("%@ 分鐘後重置"), "hours": model.text("%@ 小時 %@ 分鐘後重置"),
                 "reset": model.text("%@ 重置")]

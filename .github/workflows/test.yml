@@ -44,4 +44,4 @@ jobs:
       - name: Build native app bundle
         run: ./script/build_and_run.sh --build-only
       - name: Verify app signature
-        run: codesign --verify --deep --strict dist/GPTNiangMac.app
+        run: codesign --verify --deep --strict dist/XiaoBaiLongNiangMac.app

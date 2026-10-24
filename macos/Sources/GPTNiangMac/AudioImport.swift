@@ -122,7 +122,7 @@ final class WidgetAudio: ObservableObject {
         }
     }
     private func warning(_ message: String) {
-        let alert = NSAlert(); alert.messageText = text("GPT 娘 · 音效"); alert.informativeText = message
+        let alert = NSAlert(); alert.messageText = text("小白龙娘 · 音效"); alert.informativeText = message
         alert.alertStyle = .warning; alert.addButton(withTitle: text("确定")); alert.runModal()
     }
     private func convert(_ source: URL, to target: URL) throws {

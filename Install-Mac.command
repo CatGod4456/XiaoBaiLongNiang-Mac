@@ -9,19 +9,19 @@ fi
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 echo "先编译并运行测试。通过前不会替换已安装应用。"
 bash Build-Mac.command --no-open
-widget_source="$PWD/dist/GPTNiangMac.app"
+widget_source="$PWD/dist/XiaoBaiLongNiangMac.app"
 widget_parent="$HOME/Applications"
-if [ -d /Applications/GPTNiangMac.app ] && [ -w /Applications ]; then widget_parent=/Applications; fi
+if [ -d /Applications/XiaoBaiLongNiangMac.app ] && [ -w /Applications ]; then widget_parent=/Applications; fi
 mkdir -p "$widget_parent"
 widget_parent="$(cd "$widget_parent" && pwd -P)"
-widget_target="$widget_parent/GPTNiangMac.app"
+widget_target="$widget_parent/XiaoBaiLongNiangMac.app"
 if [ -L "$widget_target" ]; then echo "目标是符号链接，已停止安装。"; exit 1; fi
 if [ -e "$widget_target" ]; then
   widget_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$widget_target/Contents/Info.plist")
-  if [ "$widget_id" != io.github.t7moris.GPTNiangMac ]; then echo "目标存在其他应用，已停止安装。"; exit 1; fi
+  if [ "$widget_id" != io.github.catgod4456.XiaoBaiLongNiangMac ]; then echo "目标存在其他应用，已停止安装。"; exit 1; fi
 fi
 widget_job="$(mktemp -d "$widget_parent/.gpt-niang-deploy.XXXXXXXX")"
-widget_stage="$widget_job/GPTNiangMac.app"
+widget_stage="$widget_job/XiaoBaiLongNiangMac.app"
 widget_backup="$widget_job/previous.app"
 widget_health="$widget_job/health.json"
 widget_previous=0
@@ -32,13 +32,13 @@ widget_running_paths=()
 stop_widget() {
   local candidate executable bundle identifier attempt
   local remember="${1:-0}"
-  for candidate in $(/usr/bin/pgrep -u "$(/usr/bin/id -u)" -x GPTNiangMac || true); do
+  for candidate in $(/usr/bin/pgrep -u "$(/usr/bin/id -u)" -x XiaoBaiLongNiangMac || true); do
     executable=$(/bin/ps -ww -p "$candidate" -o comm= 2>/dev/null || true)
     case "$executable" in
-      */GPTNiangMac.app/Contents/MacOS/GPTNiangMac)
-        bundle="${executable%/Contents/MacOS/GPTNiangMac}"
+      */XiaoBaiLongNiangMac.app/Contents/MacOS/XiaoBaiLongNiangMac)
+        bundle="${executable%/Contents/MacOS/XiaoBaiLongNiangMac}"
         identifier=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$bundle/Contents/Info.plist" 2>/dev/null || true)
-        if [ "$identifier" = io.github.t7moris.GPTNiangMac ]; then
+        if [ "$identifier" = io.github.catgod4456.XiaoBaiLongNiangMac ]; then
           if [ "$remember" -eq 1 ]; then widget_running_paths+=("$bundle"); widget_stopped=1; fi
           kill -TERM "$candidate" 2>/dev/null || true
           for attempt in {1..50}; do
@@ -79,7 +79,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 /usr/bin/ditto "$widget_source" "$widget_stage"
 /usr/bin/codesign --verify --deep --strict "$widget_stage"
-/usr/bin/lipo "$widget_stage/Contents/MacOS/GPTNiangMac" -verify_arch "$(/usr/bin/uname -m)"
+/usr/bin/lipo "$widget_stage/Contents/MacOS/XiaoBaiLongNiangMac" -verify_arch "$(/usr/bin/uname -m)"
 stop_widget 1
 if [ -d "$widget_target" ]; then
   /bin/mv "$widget_target" "$widget_backup"

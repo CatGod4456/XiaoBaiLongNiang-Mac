@@ -9,7 +9,7 @@ final class EasterEggTests: XCTestCase {
         let data = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: data) }
         let model = WidgetModel(dataDirectory: data, resources: data)
-        for (egg, count) in [(EasterEgg.dance, 140), (.zero, 98)] {
+        for (egg, count) in [(EasterEgg.dance, 168), (.zero, 235)] {
             let source = try XCTUnwrap(CGImageSourceCreateWithURL(model.easterEggURL(egg) as CFURL, nil))
             XCTAssertEqual(CGImageSourceGetCount(source), count)
             let properties = CGImageSourceCopyProperties(source, nil) as? [CFString: Any]

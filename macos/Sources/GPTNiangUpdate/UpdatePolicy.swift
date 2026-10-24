@@ -41,7 +41,7 @@ public struct SelectedRelease {
     public let checksums: ReleaseAsset
 }
 public enum UpdatePolicy {
-    public static let bundleID = "io.github.t7moris.GPTNiangMac"
+    public static let bundleID = "io.github.catgod4456.XiaoBaiLongNiangMac"
     public static let api = URL(string: "https://api.github.com/repos/T7moris/GPT-Niang/releases/latest")!
     public static let maximumArchive = 50 * 1024 * 1024
     public static let maximumExpanded = 200 * 1024 * 1024

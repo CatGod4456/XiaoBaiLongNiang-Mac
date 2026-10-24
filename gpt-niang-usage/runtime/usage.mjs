@@ -167,7 +167,7 @@ export function readUsage(cli, {timeoutMs=18000,spawnProcess=spawn,onAccount=()=
         finish(data);
       }
     });
-    send({id:1,method:'initialize',params:{clientInfo:{name:'gpt_niang_usage',title:'GPT 娘额度挂件',version:pluginVersion}}});
+    send({id:1,method:'initialize',params:{clientInfo:{name:'xiaobai_longniang_usage',title:'小白龙娘额度挂件',version:pluginVersion}}});
   });
 }
 

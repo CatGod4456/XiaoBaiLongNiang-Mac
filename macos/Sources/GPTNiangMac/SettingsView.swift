@@ -10,7 +10,7 @@ struct SettingsView: View {
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .firstTextBaseline) {
-                Text(model.text("GPT 娘")).font(.system(size: 27, weight: .semibold, design: .rounded))
+                Text(model.text("小白龙娘")).font(.system(size: 27, weight: .semibold, design: .rounded))
                 Text("macOS · \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev")").font(.caption).foregroundStyle(.secondary)
                 Spacer()
             }
@@ -168,7 +168,7 @@ struct SettingsView: View {
                                 else { try SMAppService.mainApp.unregister() }
                                 model.savePreferences()
                                 loginError = nil
-                                if SMAppService.mainApp.status == .requiresApproval { loginError = model.text("請在系統設定的「登入項目」允許 GPT 娘。") }
+                                if SMAppService.mainApp.status == .requiresApproval { loginError = model.text("請在系統設定的「登入項目」允許 小白龙娘。") }
                             } catch { loginError = model.text("登入項目設定失敗：%@", String(describing: error.localizedDescription)) }
                         }
                     if let loginError { Text(loginError).font(.caption).foregroundStyle(.orange) }

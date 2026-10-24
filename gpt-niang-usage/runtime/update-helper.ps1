@@ -103,7 +103,7 @@ function Copy-WidgetVerifiedTree([string]$Source,[string]$Destination) {
 function Copy-WidgetUnmanagedRootItems($Journal,[switch]$EmbeddedData) {
   # Legacy installs often share their outer folder with screenshots and downloads.
   $managed=@('.agents','gpt-niang-usage','.gitignore','LICENSE','README.md','更新记录.md','SHA256SUMS.txt',
-    '安装GPT娘.cmd','打开GPT娘.cmd','停用GPT娘.cmd','检测套餐.cmd')
+    '安装小白龙娘.cmd','打开小白龙娘.cmd','停用小白龙娘.cmd','检测套餐.cmd')
   foreach($item in @(Get-ChildItem -LiteralPath $Journal.root -Force)){
     if($item.Name-in $managed){continue}
     $containsData=$Journal.dataDir-ieq $item.FullName -or $Journal.dataDir.StartsWith($item.FullName+'\',[StringComparison]::OrdinalIgnoreCase)

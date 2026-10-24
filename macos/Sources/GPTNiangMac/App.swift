@@ -4,6 +4,7 @@ import Combine
 import GPTNiangCore
 import Darwin
 import os
+import ServiceManagement
 
 @main
 struct GPTNiangEntry {
@@ -55,7 +56,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private var diagnosticsURL: URL?
     private var deploymentHealthURL: URL?
     private var lastDeploymentHealth = -Double.infinity
-    private let logger = Logger(subsystem: "io.github.t7moris.GPTNiangMac", category: "window")
+    private let logger = Logger(subsystem: "io.github.catgod4456.XiaoBaiLongNiangMac", category: "window")
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let args = ProcessInfo.processInfo.arguments
@@ -80,6 +81,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         diagnosticsURL = argument("--diagnostics").map { URL(fileURLWithPath: $0) }
         deploymentHealthURL = argument("--deployment-health").map { URL(fileURLWithPath: $0) }
         model = WidgetModel(dataDirectory: dataDirectory, resources: resources)
+        // Carry forward the user's existing login-item choice after the app is renamed.
+        if model.loginRequested && SMAppService.mainApp.status == .notRegistered {
+            do { try SMAppService.mainApp.register() }
+            catch { model.settingsError = model.text("登入項目設定失敗：%@", error.localizedDescription) }
+        }
         updater = NativeUpdater(data: dataDirectory, idle: { [weak self] in
             guard let self else { return false }
             return self.dragOrigin == nil && self.trackingMenus == 0 && self.settingsWindow?.isVisible != true &&
@@ -89,7 +95,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         }, terminate: { NSApp.terminate(nil) })
         panel = WidgetPanel(contentRect: NSRect(x: 0, y: 0, width: 378, height: 378),
                         styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-        panel.title = model.text("GPT 娘額度掛件")
+        panel.title = model.text("小白龙娘額度掛件")
         panel.backgroundColor = .clear; panel.isOpaque = false; panel.hasShadow = false
         panel.isFloatingPanel = false; panel.hidesOnDeactivate = false
         // Join the host's Stage Manager set/fullscreen space without becoming a
@@ -147,9 +153,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         }
     }
     private func localizeWindowTitles() {
-        panel?.title = model.text("GPT 娘額度掛件")
-        settingsWindow?.title = model.text("GPT 娘設定")
-        speedWindow?.title = model.text("GPT 娘 · 聊天速度")
+        panel?.title = model.text("小白龙娘額度掛件")
+        settingsWindow?.title = model.text("小白龙娘設定")
+        speedWindow?.title = model.text("小白龙娘 · 聊天速度")
     }
     private func buildMenu() {
         if statusItem == nil { statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength) }
@@ -158,7 +164,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         let summary = NSMenuItem(title: model.text("正在讀取目前帳戶的額度…"), action: nil, keyEquivalent: "")
         summary.representedObject = "quota-summary"; summary.isEnabled = false; menu.addItem(summary)
         menu.addItem(.separator())
-        for (title, selector) in [(model.text("GPT 娘 · Codex 額度"), #selector(showQuota)), (model.text("刷新額度"), #selector(refresh)), (model.text("來一句語錄"), #selector(quote)), (model.text("聊天速度…"), #selector(showSpeed))] {
+        for (title, selector) in [(model.text("小白龙娘 · Codex 額度"), #selector(showQuota)), (model.text("刷新額度"), #selector(refresh)), (model.text("來一句語錄"), #selector(quote)), (model.text("聊天速度…"), #selector(showSpeed))] {
             let item = NSMenuItem(title: model.text(title), action: selector, keyEquivalent: ""); item.target = self; menu.addItem(item)
         }
         menu.addItem(.separator())
@@ -169,11 +175,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         audio.submenu = model.audio.nativeMenu(target: self, action: #selector(audioAction(_:)), delegate: self); menu.addItem(audio)
         let settings = NSMenuItem(title: model.text("設定…"), action: #selector(showSettings), keyEquivalent: ","); settings.target = self; menu.addItem(settings)
         let update = NSMenuItem(title: model.text("檢查更新…"), action: #selector(checkUpdate), keyEquivalent: ""); update.target = self; menu.addItem(update)
-        let quit = NSMenuItem(title: model.text("退出 GPT 娘"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"); menu.addItem(quit)
+        let quit = NSMenuItem(title: model.text("退出 小白龙娘"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"); menu.addItem(quit)
         statusItem?.menu = menu
         let main = NSMenu()
         let appMenu = NSMenuItem()
-        let applicationMenu = NSMenu(title: model.text("GPT 娘")); applicationMenu.delegate = self
+        let applicationMenu = NSMenu(title: model.text("小白龙娘")); applicationMenu.delegate = self
         for item in menu.items {
             if item.isSeparatorItem { applicationMenu.addItem(.separator()); continue }
             let copy = NSMenuItem(title: item.title, action: item.action, keyEquivalent: item.keyEquivalent)
@@ -211,7 +217,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     @objc private func showSettings() {
         if settingsWindow == nil {
             let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 620), styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
-            window.title = model.text("GPT 娘設定"); window.isReleasedWhenClosed = false; window.delegate = self
+            window.title = model.text("小白龙娘設定"); window.isReleasedWhenClosed = false; window.delegate = self
             window.contentView = NSHostingView(rootView: SettingsView(model: model, updater: updater))
             window.center(); settingsWindow = window
         }
@@ -221,7 +227,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     @objc private func showSpeed() {
         if speedWindow == nil {
             let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 620, height: 580), styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
-            window.title = model.text("GPT 娘 · 聊天速度"); window.isReleasedWhenClosed = false; window.delegate = self
+            window.title = model.text("小白龙娘 · 聊天速度"); window.isReleasedWhenClosed = false; window.delegate = self
             window.contentView = NSHostingView(rootView: ThreadSpeedView(store: speedStore, model: model)); window.center(); speedWindow = window
         }
         speedStore.start(model: model)
@@ -386,7 +392,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         if menuIconRevision != model.characterRevision { updateMenuIcon() }
         let title = MenuBarPresentation.quotaTitle(model.snapshot)
         if statusItem?.button?.title != title { statusItem?.button?.title = title }
-        statusItem?.button?.toolTip = model.text(model.isLowQuota ? "额度低于 5%" : "GPT 娘 · Codex 額度")
+        statusItem?.button?.toolTip = model.text(model.isLowQuota ? "额度低于 5%" : "小白龙娘 · Codex 額度")
     }
     private func updateWindow() {
         guard model != nil, panel != nil else { return }
