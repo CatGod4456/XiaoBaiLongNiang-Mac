@@ -1,4 +1,4 @@
-param([switch]$CheckOnly,[switch]$Preview,[string]$AppDir=$PSScriptRoot)
+﻿param([switch]$CheckOnly,[switch]$Preview,[string]$AppDir=$PSScriptRoot)
 $ErrorActionPreference='Stop'
 $script:appDir=$AppDir
 $script:configPath=Join-Path $script:appDir 'installation.json'
@@ -7,6 +7,7 @@ $script:config=Get-Content -LiteralPath $script:configPath -Raw -Encoding UTF8 |
 $script:dataDir=$script:config.dataDir
 $null=New-Item -ItemType Directory -Path $script:dataDir -Force
 . (Join-Path $script:appDir 'runtime\quotes.ps1')
+. ([ScriptBlock]::Create([IO.File]::ReadAllText((Join-Path $script:appDir 'runtime\windows-port.ps1'),[Text.Encoding]::UTF8)))
 . (Join-Path $script:appDir 'runtime\completion-notifications.ps1')
 . ([ScriptBlock]::Create([IO.File]::ReadAllText((Join-Path $script:appDir 'runtime\ui-settings.ps1'),[Text.Encoding]::UTF8)))
 . ([ScriptBlock]::Create([IO.File]::ReadAllText((Join-Path $script:appDir 'runtime\characters.ps1'),[Text.Encoding]::UTF8)))
@@ -74,14 +75,16 @@ public static class GptWidgetNative {
       return p.SessionId==Session&&(name.Equals("Codex",StringComparison.OrdinalIgnoreCase)||name.Equals("ChatGPT",StringComparison.OrdinalIgnoreCase))&&CodexExecutable(p.MainModule.FileName);
     }}catch{return false;}
   }
-  public static IntPtr FindCodex(){
-    var f=GetAncestor(GetForegroundWindow(),2);if(IsCodex(f))return f;
-    IntPtr found=IntPtr.Zero;
-    EnumWindows((h,p)=>{if(IsWindowVisible(h)&&!IsIconic(h)&&IsCodex(h)){found=h;return false;}return true;},IntPtr.Zero);
-    return found;
+  public static bool PreferForegroundArea(long foreground,long largest){return foreground>0&&foreground>=largest*.65;}
+  static long Area(IntPtr h){var r=Frame(h);return Math.Max(0L,(long)r.Right-r.Left)*Math.Max(0L,(long)r.Bottom-r.Top);}
+  static IntPtr PreferredHost(IntPtr foreground){
+    IntPtr found=IntPtr.Zero;long largest=0;
+    EnumWindows((h,p)=>{if(IsWindowVisible(h)&&!IsIconic(h)&&IsCodex(h)){long area=Area(h);if(area>largest){largest=area;found=h;}}return true;},IntPtr.Zero);
+    return IsCodex(foreground)&&IsWindowVisible(foreground)&&!IsIconic(foreground)&&PreferForegroundArea(Area(foreground),largest)?foreground:found;
   }
+  public static IntPtr FindCodex(){return PreferredHost(GetAncestor(GetForegroundWindow(),2));}
   public static int ProcessId(IntPtr h){uint p;GetWindowThreadProcessId(h,out p);return (int)p;}
-  public static IntPtr ForegroundHost(IntPtr h){var root=GetAncestor(h,2);return IsCodex(root)?root:IntPtr.Zero;}
+  public static IntPtr ForegroundHost(IntPtr h){var root=GetAncestor(h,2);return IsCodex(root)?PreferredHost(root):IntPtr.Zero;}
   public static string Title(IntPtr h){var b=new StringBuilder(256);GetWindowText(h,b,256);return b.ToString();}
 }
 '@
@@ -156,13 +159,18 @@ try{$settings=Get-Content -LiteralPath $settingsFile -Raw -Encoding UTF8 | Conve
   if($null-ne $settings.desktopTop){try{$value=[double]$settings.desktopTop;if(![double]::IsNaN($value)-and ![double]::IsInfinity($value)-and [Math]::Abs($value)-le 100000){$script:desktopTop=$value}}catch{}}
   if($settings.characterId-is [string]){$script:characterId=$settings.characterId}
 }catch{$script:settingsLoadFailed=$true}
+Initialize-WidgetPortSettings $settings
 Initialize-WidgetAutoQuoteSettings $settings
 Initialize-CompletionNotificationState $settings
 function Write-WidgetJson($file,$value){
   $temp=$file+'.tmp';[IO.File]::WriteAllText($temp,($value|ConvertTo-Json -Depth 6),[Text.UTF8Encoding]::new($false))
   if([IO.File]::Exists($file)){[IO.File]::Replace($temp,$file,($file+'.bak'),$true)}else{[IO.File]::Move($temp,$file)}
 }
-function Save-Settings {Write-WidgetJson $settingsFile @{layoutVersion=2;right=$script:offsetRight;left=$script:offsetLeft;bottom=$script:offsetBottom;anchor=$script:anchor;side=$script:side;scale=$script:scale;bubbleScale=$script:bubbleScale;collapsed=$script:collapsed;soundOn=$script:soundOn;soundVolume=$script:soundVolume;bubbleTapAdvance=$script:bubbleTapAdvance;hideMenu=$script:hideMenu;colorMode=$script:colorMode;colorChance=$script:colorChance;colorTextChance=$script:colorTextChance;colorPaused=$script:colorPaused;followHost=$script:followHost;desktopTopmost=$script:desktopTopmost;desktopLeft=$script:desktopLeft;desktopTop=$script:desktopTop;characterId=$script:characterId;autoQuoteEnabled=$script:autoQuoteEnabled;autoQuoteIntervalSeconds=$script:autoQuoteIntervalSeconds;taskCompletionBubble=$script:completionNotificationsEnabled}}
+function Save-Settings {
+  $values=@{layoutVersion=2;right=$script:offsetRight;left=$script:offsetLeft;bottom=$script:offsetBottom;anchor=$script:anchor;side=$script:side;scale=$script:scale;bubbleScale=$script:bubbleScale;collapsed=$script:collapsed;soundOn=$script:soundOn;soundVolume=$script:soundVolume;bubbleTapAdvance=$script:bubbleTapAdvance;hideMenu=$script:hideMenu;colorMode=$script:colorMode;colorChance=$script:colorChance;colorTextChance=$script:colorTextChance;colorPaused=$script:colorPaused;followHost=$script:followHost;desktopTopmost=$script:desktopTopmost;desktopLeft=$script:desktopLeft;desktopTop=$script:desktopTop;characterId=$script:characterId;autoQuoteEnabled=$script:autoQuoteEnabled;autoQuoteIntervalSeconds=$script:autoQuoteIntervalSeconds;taskCompletionBubble=$script:completionNotificationsEnabled}
+  if($script:portSettings){foreach($key in $script:portSettings.Keys){$values[$key]=$script:portSettings[$key]}}
+  Write-WidgetJson $settingsFile $values
+}
 function Set-WidgetCharacter([string]$Id,[switch]$NoSave) {
   if($script:widgetMusic -and $script:widgetMusic.Enabled){Stop-WidgetMusic}
   $character=Get-WidgetCharacter $script:appDir $script:dataDir $Id
@@ -187,6 +195,8 @@ function Set-WidgetCharacter([string]$Id,[switch]$NoSave) {
     if($script:widgetColors){foreach($overlay in @($script:widgetColors.halo,$script:widgetColors.tint)){if($overlay -and $overlay.OpacityMask){$overlay.OpacityMask.ImageSource=$previous.bitmap}}}
     throw
   }
+  if($script:portMotion){$script:portMotion.Stop();$script:portImage=$null;Update-WidgetPortState;Set-BubbleState}
+  if($script:portTray){$script:portTray.SetPortrait($script:bitmap)}
   if($script:settingsMenuUi){Update-WidgetSettingsMenu}
   return $character
 }
@@ -281,6 +291,7 @@ function Set-Appearance {
   # overshoot without shrinking the character or exposing a rectangular cut.
   $null=Set-WidgetPixelSize (Get-WidgetPlacementDpi)
   Set-WidgetIndependentLayout
+  if($script:portMotion){$script:portMotion.Reposition(14)}
   # The Viewbox scales the completed pose, including the mirror origin and press motion.
   # Scaling and mirroring this same Canvas made its origin escape the native window.
   $script:ui.Root.LayoutTransform=[Windows.Media.Transform]::Identity
@@ -366,7 +377,7 @@ function Animate-Value($target,$property,[double]$to,[int]$duration,[int]$delay=
 function Set-BubbleState {
   foreach($name in @('Bubble','Tail','TailNear')){
     $element=$script:ui[$name]
-    $element.Visibility=if($script:collapsed -and !$script:settingsBubblePreview){[Windows.Visibility]::Hidden}else{[Windows.Visibility]::Visible}
+    $element.Visibility=if(($script:portMotion -and $script:portMotion.Active) -or ($script:collapsed -and !$script:settingsBubblePreview)){[Windows.Visibility]::Hidden}else{[Windows.Visibility]::Visible}
     Set-AnimatedValue $element ([Windows.UIElement]::OpacityProperty) 1
     Set-AnimatedValue $element.RenderTransform ([Windows.Media.ScaleTransform]::ScaleXProperty) 1
     Set-AnimatedValue $element.RenderTransform ([Windows.Media.ScaleTransform]::ScaleYProperty) 1
@@ -505,6 +516,7 @@ function Next-Bubble {
   if($script:bubbleMode-eq 'quota'){Switch-Scene 'quote'}else{Hide-Quota}
 }
 function Click-Character {
+  if($script:portMotion -and (Invoke-WidgetEasterEgg)){return}
   if($script:collapsed){Show-Quota}
   elseif($script:bubbleTapAdvance){Next-Bubble}
   elseif($script:bubbleMode-ne 'quota'){Switch-Scene 'quota'}
@@ -580,6 +592,10 @@ function Hide-Quota([switch]$KeepCompletion) {
   $script:closeTimer.Start();Save-Settings
 }
 function Animate-Press([bool]$down) {
+  if($script:portMotion){
+    if($down -and $script:portMotion.Active){$script:portMotion.Stop();Set-BubbleState;$script:portStoppedOnPress=$true}
+    $script:portMotion.Press($down);return
+  }
   $x=if($down){1.05}else{1.0};$y=if($down){0.88}else{1.0}
   Animate-Value $script:ui.PressScale ([Windows.Media.ScaleTransform]::ScaleXProperty) $x 220 0 $true
   Animate-Value $script:ui.PressScale ([Windows.Media.ScaleTransform]::ScaleYProperty) $y 220 0 $true
@@ -596,6 +612,7 @@ function Set-MenuVisible([bool]$show){
 }
 function Test-GirlAlpha([Windows.Point]$rootPoint){
   $point=$script:ui.Root.TranslatePoint($rootPoint,$script:ui.Girl)
+  if($script:portMotion){return $script:portMotion.Contains($point.X,$point.Y,$script:ui.Girl.ActualWidth,$script:ui.Girl.ActualHeight)}
   $fit=[Math]::Min($script:ui.Girl.ActualWidth/$script:bitmap.PixelWidth,$script:ui.Girl.ActualHeight/$script:bitmap.PixelHeight)
   if($fit-le 0){return $false}
   $x=[int][Math]::Floor(($point.X-($script:ui.Girl.ActualWidth-$script:bitmap.PixelWidth*$fit)/2)/$fit)
@@ -710,7 +727,9 @@ function Update-Quota {
   $script:ui.Header.ToolTip=if($script:status.planLabel){'当前套餐：'+$script:status.planLabel+' · 重置时间按本机时间显示'}else{'重置时间按本机时间显示'}
   Update-BubbleTooltip
   if($script:widgetColors){Update-WidgetColorScene}
+  if($script:portSettings){Update-WidgetPortState}
 }
+Initialize-WidgetPort
 Set-Appearance;Set-BubbleState;Initialize-WidgetColors;Update-Quota
 if($CheckOnly){$hostWindow=[GptWidgetNative]::FindCodex();$foregroundWindow=[GptWidgetNative]::GetAncestor([GptWidgetNative]::GetForegroundWindow(),2);@{ok=$true;imageLoaded=$script:bitmap.PixelWidth-gt 0;characterId=$script:characterId;characterName=$script:activeCharacter.name;soundVolume=$script:soundVolume;sizing=@{character=$script:scale;bubble=$script:bubbleScale;display=$script:displayScale};autoQuotes=@{enabled=$script:autoQuoteEnabled;intervalSeconds=$script:autoQuoteIntervalSeconds};completion=(Get-CompletionNotificationStatus);placement=@{right=$script:offsetRight;left=$script:offsetLeft;bottom=$script:offsetBottom};host=$hostWindow.ToInt64();hostTitle=[GptWidgetNative]::Title($hostWindow);foreground=$foregroundWindow.ToInt64();foregroundTitle=[GptWidgetNative]::Title($foregroundWindow);dataDir=$script:dataDir}|ConvertTo-Json;return}
 if($Preview){
@@ -727,6 +746,7 @@ $script:mutex=[Threading.Mutex]::new($false,$mutexKey);$script:mutexOwned=$false
 try{$script:mutexOwned=$script:mutex.WaitOne(0)}catch [Threading.AbandonedMutexException]{$script:mutexOwned=$true}
 if(!$script:mutexOwned){Request-Refresh;$script:mutex.Dispose();return}
 Initialize-WidgetAudio -AppDir $script:appDir -DataDir $script:dataDir
+Initialize-WidgetTray
 # A stop request written while this GUI was still starting must win. Only a
 # recent flag is honoured (stale leftovers are removed); the flag is removed
 # after honoring so a later manual start is not blocked.
@@ -908,6 +928,8 @@ function Ensure-QuotaWorker([long]$now){
 }
 function Stop-WidgetRuntime {
   if($script:runtimeClosed){return};$script:runtimeClosed=$true
+  try{if($script:portTray){$script:portTray.Dispose()}}catch{}
+  try{if($script:portMotion){$script:portMotion.Dispose()}}catch{}
   try{if($script:occlusionRecovery){$script:occlusionRecovery.Dispose()}}catch{}
   try{Stop-WidgetMusic}catch{}
   try{if($script:hostFollower){$script:hostFollower.Dispose()}}catch{}
@@ -937,6 +959,11 @@ function Tick-Widget {
   Tick-WidgetUpdater $now
   if($now-$script:lastPresence-ge 1000 -and (Test-Path -LiteralPath (Join-Path $script:dataDir 'stop.flag'))){$script:window.Close();return}
   Ensure-QuotaWorker $now
+  if($script:portSettings -and $script:portSettings.trayOnly){
+    if($script:window.IsVisible){$script:window.Hide()}
+    if($now-$script:lastPresence-ge 1000){Write-WidgetPresence $false $now;$script:lastPresence=$now;Update-Quota;Read-DisplayRequest}
+    return
+  }
   if($script:completionTemporary){
     if($script:occlusionRecovery){$script:occlusionRecovery.Configure([IntPtr]::Zero,$false)}
     if($now-$script:lastPresence-ge 1000){Write-WidgetPresence $true $now;$script:lastPresence=$now;Update-Quota;Read-DisplayRequest;Tick-CompletionNotifications $true}

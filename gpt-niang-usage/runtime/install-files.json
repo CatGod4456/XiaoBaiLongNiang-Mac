@@ -56,5 +56,15 @@
   ".codex-plugin/plugin.json",
   "package.json",
   "Install.ps1",
-  "Uninstall.ps1"
+  "Uninstall.ps1",
+  "runtime/windows-port.ps1",
+  "runtime/widget-motion.cs",
+  "runtime/widget-tray.cs",
+  "assets/egg-squish.png",
+  "assets/egg-dance.gif",
+  "assets/egg-zero.gif",
+  "assets/gpt-dragon-niang-low-quota.png",
+  "assets/AppIcon.ico",
+  "assets/EASTER-EGGS-SOURCE.txt",
+  "custom-build.json"
 ]

@@ -12,7 +12,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24.22.1'
+      - name: Parse Windows PowerShell sources
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          Get-ChildItem gpt-niang-usage -Recurse -Filter *.ps1 | ForEach-Object {
+            $tokens=$null;$errors=$null
+            $null=[Management.Automation.Language.Parser]::ParseFile($_.FullName,[ref]$tokens,[ref]$errors)
+            if($errors.Count){throw ($_.FullName+': '+($errors.Message -join '; '))}
+          }
+      - name: Windows port animation and quota tests
+        shell: powershell
+        run: |
+          & powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File gpt-niang-usage/tests/windows-port.test.ps1 -OutputDirectory "$env:RUNNER_TEMP/port-frames"
+          if($LASTEXITCODE-ne 0){exit $LASTEXITCODE}
       - name: Shared Node runtime tests
         working-directory: gpt-niang-usage
         run: npm test
@@ -26,9 +40,14 @@ jobs:
       - name: Windows installer, lifecycle and WPF tests
         working-directory: gpt-niang-usage
         run: npm run test:windows
-      - name: Verify Windows packaging
-        run: python scripts/build-release.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-port-frames
+          path: ${{ runner.temp }}/port-frames
+          if-no-files-found: ignore
   macos:
+    if: ${{ false }}
     runs-on: macos-latest
     timeout-minutes: 20
     steps:

@@ -216,6 +216,7 @@ function Initialize-WidgetSettingsMenu {
   Add-SettingsDivider
   Add-SettingsAction '恢复右下角位置' {if($script:followHost){$script:offsetRight=0;$script:offsetLeft=0;$script:offsetBottom=0;$script:anchor='right'}else{$script:desktopLeft=$null;$script:desktopTop=$null};$script:side='right';$script:lastPosition=$null;Set-Facing;Hide-Quota;Save-Settings;Tick-Widget} -StayOpen
   } -ReturnItem
+  if(Get-Command Add-WidgetPortMenu -ErrorAction SilentlyContinue){Add-WidgetPortMenu}
   $script:settingsMenuUi.Updates=Add-SettingsSubmenu '更新' {
     $script:settingsMenuUi.UpdateVersion=Add-SettingsAction '当前版本' {} -ReturnItem;$script:settingsMenuUi.UpdateVersion.IsEnabled=$false
     Add-SettingsAction '检查并更新' {Start-WidgetUpdate 'manual'}
@@ -267,6 +268,7 @@ function Update-WidgetSettingsMenu{
   $script:settingsMenuSync=$true
   try{
     Update-WidgetUpdateMenu
+    if(Get-Command Update-WidgetPortMenu -ErrorAction SilentlyContinue){Update-WidgetPortMenu}
     $script:settingsMenuUi.MusicEnabled.IsChecked=Test-WidgetMusicActive
     $script:settingsMenuUi.Completion.IsChecked=$script:completionNotificationsEnabled
     $script:settingsMenuUi.AutoQuoteEnabled.IsChecked=$script:autoQuoteEnabled

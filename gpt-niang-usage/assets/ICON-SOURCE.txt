@@ -16,3 +16,5 @@ Menu-bar icon: the current normal portrait is copied and resized to 20x20 by mac
 
 Source code/documentation follow the existing project MIT license. Character artwork, derived icons and third-party marks follow their respective source conditions; this record does not relicense third-party rights or imply official endorsement.
 See CREDITS.md, USER-CHARACTER-SOURCE.txt and CHARACTER-NOTICE.txt.
+
+Windows: AppIcon.ico is a multi-size format export of the same docs/images/app-icon.png (16–256 px). Windows tray uses the selected normal portrait with a quota badge. These platform exports do not change the character-design credit.

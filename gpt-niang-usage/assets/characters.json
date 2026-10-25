@@ -1,6 +1,15 @@
 {
   "version": 1,
   "characters": [
-    { "id": "gpt-dragon", "name": "龙娘1", "file": "gpt-dragon-niang-bust.png" }
+    {
+      "id": "gpt-dragon",
+      "name": "龙娘1",
+      "file": "gpt-dragon-niang-bust.png"
+    },
+    {
+      "id": "gpt-dragon-low",
+      "name": "低额度龙娘",
+      "file": "gpt-dragon-niang-low-quota.png"
+    }
   ]
 }
