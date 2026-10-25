@@ -22,9 +22,10 @@ function Get-WidgetInstallPreflight {
   if(Test-Path -LiteralPath $previousConfig){$previous=Read-WidgetUpdateJson $previousConfig;$dataDir=Get-WidgetInstallationDataDir -AppDir $appDir -Configuration $previous}
   $dataDir=[IO.Path]::GetFullPath($dataDir).TrimEnd('\')
   if($appDir-ieq $dataDir -or $appDir.StartsWith($dataDir+'\',[StringComparison]::OrdinalIgnoreCase) -or $dataDir.StartsWith((Join-Path $appDir 'runtime')+'\',[StringComparison]::OrdinalIgnoreCase) -or $dataDir-ieq (Join-Path $appDir 'runtime')){throw 'Data directory overlaps program files.'}
+  $embeddedNode=Join-Path $appDir 'bin\node.exe'
   $nodeCommand=Get-Command node.exe -ErrorAction SilentlyContinue
-  if(!$nodeCommand){throw 'Node.js 20 or later is required. Install Node.js and reopen the installer.'}
-  $node=$nodeCommand.Source
+  $node=if(Test-Path -LiteralPath $embeddedNode -PathType Leaf){$embeddedNode}elseif($nodeCommand){$nodeCommand.Source}else{$null}
+  if(!$node){throw 'Node.js 20 or later is required. Install Node.js and reopen the installer.'}
   $nodeMajor=[int]((& $node --version).TrimStart('v').Split('.')[0])
   if($nodeMajor-lt 20){throw 'Node.js 20 or later is required.'}
   $codexCommand=Get-Command codex.exe -ErrorAction SilentlyContinue
@@ -44,7 +45,8 @@ function Get-WidgetInstallPreflight {
   if(!(Test-Path -LiteralPath (Join-Path (Split-Path $sourceDir -Parent) '.agents\plugins\marketplace.json'))){throw 'Marketplace metadata missing.'}
   $startup=[Environment]::GetFolderPath('Startup');if(!$startup){throw 'Windows Startup folder unavailable.'}
   $shortcut=Join-Path $startup 'GPT Niang Usage.lnk'
-  $config=@{version=$manifest.version;appDir=$appDir;dataDir=$dataDir;nodePath=$node;codexPath=$codex;marketplaceRoot=(Split-Path $appDir -Parent);startupShortcut=$shortcut;installedAt=[DateTime]::UtcNow.ToString('o');updateAgent=(Get-WidgetUpdateAgentDir);updaterSchema=1}
+  $custom=Read-WidgetUpdateJson (Join-Path $sourceDir 'custom-build.json')
+  $config=@{version=$manifest.version;appDir=$appDir;dataDir=$dataDir;nodePath=$node;codexPath=$codex;marketplaceRoot=(Split-Path $appDir -Parent);startupShortcut=$shortcut;installedAt=[DateTime]::UtcNow.ToString('o');updateAgent=(Get-WidgetUpdateAgentDir);updaterSchema=1;customBuild=($custom -and $custom.customBuild-eq $true)}
   $info=Get-WidgetSupervisorInfo -AppDir $appDir -Configuration $config
   $null=Get-WidgetSupervisorTask $info
   if(Test-Path -LiteralPath $shortcut){

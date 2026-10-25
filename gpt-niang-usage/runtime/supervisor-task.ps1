@@ -107,7 +107,7 @@ function Get-WidgetSupervisorInfo {
   $agent=if(Get-Command Get-WidgetUpdateAgentDir -ErrorAction SilentlyContinue){Get-WidgetUpdateAgentDir}else{Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'GPTNiangUsage\update-agent'}
   if($config.updateAgent -and [IO.Path]::GetFullPath($config.updateAgent)-ine $agent){throw 'Stable launcher path mismatch.'}
   $stable=[bool]$config.updateAgent
-  [pscustomobject]@{AppDir=$root;DataDir=$data;Sid=$sid;TaskName=('GPT Niang Usage - '+$sid);TaskPath='\';Execute=(Join-Path $env:WINDIR 'System32\wscript.exe');Arguments=$(if($stable){'"'+(Join-Path $agent 'agent-supervisor.vbs')+'"'}else{'"'+(Join-Path $root 'supervisor.vbs')+'"'});WorkingDirectory=$(if($stable){$agent}else{$root});AgentDir=$agent}
+  [pscustomobject]@{AppDir=$root;DataDir=$data;Sid=$sid;TaskName=('GPT Niang Usage - '+$sid);TaskPath='\';Execute=(Join-Path $env:WINDIR 'System32\wscript.exe');Arguments=$(if($stable){'"'+(Join-Path $agent 'agent-supervisor.vbs')+'"'}else{'"'+(Join-Path $root 'supervisor.vbs')+'"'});WorkingDirectory=$(if($stable){$agent}else{$root});AgentDir=$agent;AutoStart=($config.autoStart-ne $false)}
 }
 
 function Resolve-WidgetSupervisorSid([string]$Identity){
@@ -189,9 +189,10 @@ function New-WidgetSupervisorTaskDefinition {
   param([Parameter(Mandatory=$true)]$Info)
   $action=New-ScheduledTaskAction -Execute $Info.Execute -Argument $Info.Arguments -WorkingDirectory $Info.WorkingDirectory
   $principal=New-ScheduledTaskPrincipal -UserId $Info.Sid -LogonType Interactive -RunLevel Limited
-  $trigger=New-ScheduledTaskTrigger -AtLogOn -User $Info.Sid
   $settings=New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew -StartWhenAvailable -Hidden
-  New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settings -Description 'Keep the local GPT Niang widget attached to the current user Codex main window.'
+  $options=@{Action=$action;Principal=$principal;Settings=$settings;Description='Keep the local GPT Niang widget attached to the current user Codex main window.'}
+  if($Info.AutoStart-ne $false){$options.Trigger=New-ScheduledTaskTrigger -AtLogOn -User $Info.Sid}
+  New-ScheduledTask @options
 }
 
 function Register-WidgetSupervisorTask {
@@ -204,7 +205,8 @@ function Register-WidgetSupervisorTask {
   $currentAction=if($existing){@($existing.Actions)[0]}else{$null}
   # An unchanged stable entry survives program replacement. Replacing the running
   # recovery task's definition can terminate its own instance on Windows.
-  if(!$currentAction -or [string]$currentAction.Arguments-ine $info.Arguments -or [IO.Path]::GetFullPath($currentAction.WorkingDirectory).TrimEnd('\')-ine $info.WorkingDirectory){
+  $triggerChanged=$existing -and ([bool](@($existing.Triggers).Count-gt 0)-ne [bool]$info.AutoStart)
+  if(!$currentAction -or $triggerChanged -or [string]$currentAction.Arguments-ine $info.Arguments -or [IO.Path]::GetFullPath($currentAction.WorkingDirectory).TrimEnd('\')-ine $info.WorkingDirectory){
     $definition=New-WidgetSupervisorTaskDefinition $info
     Register-ScheduledTask -TaskName $info.TaskName -TaskPath $info.TaskPath -InputObject $definition -Force -ErrorAction Stop|Out-Null
   }

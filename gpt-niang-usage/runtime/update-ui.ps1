@@ -1,12 +1,16 @@
 function Initialize-WidgetUpdater {
   $script:updateProcess=$null;$script:updateLastTick=0;$script:updateStartedAt=[DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds();$script:updateCleanupChecked=$false
   $preferences=Read-WidgetUpdateJson (Join-Path $script:dataDir 'update-preferences.json')
-  $script:autoUpdate=!($preferences -and $preferences.automatic-eq $false)
+  $script:autoUpdate=!($preferences -and $preferences.automatic-eq $false) -and $script:config.customBuild-ne $true
 }
 function Test-WidgetUpdateEditor {
   return [bool]($script:audioDialogOpen -or ($script:quoteEditor -and $script:quoteEditor.IsVisible) -or ($script:colorTriggerEditor -and $script:colorTriggerEditor.IsVisible) -or ($script:characterGallery -and $script:characterGallery.IsVisible))
 }
 function Start-WidgetUpdate([string]$Mode='manual') {
+  if($script:config.customBuild-eq $true){
+    if($Mode-eq 'manual'){Start-Process 'https://github.com/CatGod4456/XiaoBaiLongNiang-Mac/releases'}
+    return
+  }
   if($script:updateProcess){if(!$script:updateProcess.HasExited){return};$script:updateProcess.Dispose();$script:updateProcess=$null}
   if($Mode-eq 'manual' -and (Test-WidgetUpdateEditor)){
     [Windows.MessageBox]::Show($script:window,'请先保存并关闭编辑窗口，再检查更新。','小白龙娘更新')|Out-Null;return
@@ -21,6 +25,7 @@ function Start-WidgetUpdate([string]$Mode='manual') {
   catch{$process.Dispose();Write-WidgetSupervisorJson (Join-Path $script:dataDir 'update-status.json') @{phase='failed';message=$_.Exception.Message;nextCheckAt=[DateTimeOffset]::UtcNow.AddDays(1).ToUnixTimeMilliseconds()}}
 }
 function Set-WidgetAutomaticUpdate([bool]$Enabled) {
+  if($script:config.customBuild-eq $true){$script:autoUpdate=$false;Update-WidgetUpdateMenu;return}
   $script:autoUpdate=$Enabled
   Write-WidgetSupervisorJson (Join-Path $script:dataDir 'update-preferences.json') @{automatic=$Enabled}
   if($Enabled){Start-WidgetUpdate 'automatic-enabled'}
@@ -30,6 +35,7 @@ function Update-WidgetUpdateMenu {
   if(!$script:settingsMenuUi.UpdateVersion){return}
   $script:settingsMenuUi.UpdateVersion.Header='当前版本：'+$script:config.version
   $script:settingsMenuUi.AutoUpdate.IsChecked=$script:autoUpdate
+  if($script:config.customBuild-eq $true){$script:settingsMenuUi.AutoUpdate.IsEnabled=$false;$script:settingsMenuUi.UpdateStatus.Header.Text='定制版本：手动下载本项目 EXE 更新';return}
   $state=Read-WidgetUpdateJson (Join-Path $script:dataDir 'update-status.json')
   $label=switch($state.phase){
     'checking' {'正在检查正式版…'}
@@ -49,6 +55,7 @@ function Update-WidgetUpdateMenu {
   $script:settingsMenuUi.UpdateStatus.ToolTip=$state.message
 }
 function Tick-WidgetUpdater([long]$Now) {
+  if($script:config.customBuild-eq $true){return}
   if($Now-$script:updateLastTick-lt 1000){return};$script:updateLastTick=$Now
   Write-WidgetSupervisorJson (Join-Path $script:dataDir 'update-idle.json') @{at=$Now;pid=$PID;editor=(Test-WidgetUpdateEditor);menu=[bool]$script:context.IsOpen;drag=[bool]$script:drag}
   if($script:updateProcess -and $script:updateProcess.HasExited){
