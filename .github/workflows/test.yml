@@ -19,7 +19,8 @@ jobs:
           $ErrorActionPreference='Stop'
           Get-ChildItem gpt-niang-usage -Recurse -Filter *.ps1 | ForEach-Object {
             $tokens=$null;$errors=$null
-            $null=[Management.Automation.Language.Parser]::ParseFile($_.FullName,[ref]$tokens,[ref]$errors)
+            $source=[IO.File]::ReadAllText($_.FullName,[Text.Encoding]::UTF8)
+            $null=[Management.Automation.Language.Parser]::ParseInput($source,[ref]$tokens,[ref]$errors)
             if($errors.Count){throw ($_.FullName+': '+($errors.Message -join '; '))}
           }
       - name: Windows port animation and quota tests
